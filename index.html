@@ -57,8 +57,16 @@ body{
 .section .stitle{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--text);margin-bottom:10px;}
 .section .stitle .sline{width:3px;height:16px;background:var(--primary);border-radius:2px;}
 
-/* 卡片 */
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+/* 卡片 - 毛玻璃 */
+.card{
+  background:rgba(255,255,255,0.55);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  border:1px solid rgba(255,255,255,0.6);
+  border-radius:14px;
+  padding:16px 18px;
+  box-shadow:0 4px 20px rgba(180,140,30,.08);
+}
 
 /* 关于我 */
 .about p{color:#46536b;font-size:15px;}
@@ -111,7 +119,7 @@ footer{text-align:center;color:#b8a879;font-size:13px;margin-top:14px;padding-to
 
   <!-- 关于我 -->
   <div class="section">
-    <div class="stitle"><span class="sline"></span>关于我</div>
+    <div class="stitle"><span class="sline"></span>我的信条</div>
     <div class="card about">
       <p>永远相信美好的事情即将发生。</p>
     </div>
@@ -151,7 +159,7 @@ footer{text-align:center;color:#b8a879;font-size:13px;margin-top:14px;padding-to
 
 <script>
 // 终端打字机效果 - 输入 "xfgken"
-const text = "永远相信美好";
+const text = "xfgken";
 const el = document.getElementById('typed');
 let i = 0;
 function type(){
