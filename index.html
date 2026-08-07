@@ -108,12 +108,12 @@ footer{text-align:center;color:#b8a879;font-size:13px;margin-top:14px;padding-to
 <svg width="0" height="0" style="position:absolute;overflow:hidden">
   <filter id="lens">
   <feImage id="distImg" result="dist" preserveAspectRatio="none"/>
-  <feGaussianBlur in="dist" stdDeviation="9" result="blur"/>
-  <feDisplacementMap in="SourceGraphic" in2="blur" scale="100" xChannelSelector="R" yChannelSelector="G"/>
+  <feGaussianBlur in="dist" stdDeviation="4" result="blur"/>
+  <feDisplacementMap in="SourceGraphic" in2="blur" scale="110" xChannelSelector="R" yChannelSelector="G"/>
 </filter>
 </svg>
-<div id="stage">
 <canvas class="fx" id="fx"></canvas>
+<div id="stage">
 <div class="container">
 
   <!-- 顶栏 -->
@@ -268,43 +268,45 @@ type();
   var svgImg=document.getElementById('distImg');
   var dc=document.getElementById('dist');
   var ctx=dc.getContext('2d');
-  var dw,dh,lx=-1,ly=-1,timer=null;
+  var S=4;               // 位移图缩放（越小越快）
+  var dw,dh;
+  var curX=-1,curY=-1,raf=false;
   function size(){
-    dw=dc.width=window.innerWidth;
-    dh=dc.height=window.innerHeight;
-    lx=-1;ly=-1;render();
+    dw=dc.width=Math.max(1,Math.round(window.innerWidth/S));
+    dh=dc.height=Math.max(1,Math.round(window.innerHeight/S));
+    render();
   }
   function fill(href){
-    try{ svgImg.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',href); }
-    catch(e){}
+    try{ svgImg.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',href); }catch(e){}
     try{ svgImg.setAttribute('href',href); }catch(e){}
   }
   function render(){
-    // 底色中灰(128) = 零位移（画面不动）
+    // 中灰(128)=零位移，避免整页偏移
     ctx.fillStyle='rgb(128,128,128)';
     ctx.fillRect(0,0,dw,dh);
-    if(lx>=0){
-      var R=Math.max(90,Math.min(dw,dh)*0.18); // 透镜半径
-      var g=ctx.createRadialGradient(lx,ly,0,lx,ly,R);
+    if(curX>=0){
+      var bx=curX/S, by=curY/S;
+      // 透镜半径：相比之前减半
+      var R=Math.max(46,Math.min(window.innerWidth,window.innerHeight)*0.09)/S;
+      var g=ctx.createRadialGradient(bx,by,0,bx,by,R);
       g.addColorStop(0,'rgb(128,128,128)');
-      g.addColorStop(0.12,'rgb(160,160,160)');
-      g.addColorStop(0.45,'rgb(140,140,140)');
-      g.addColorStop(1,'rgb(255,255,255)'); // 边缘最大位移 → 反向扩张
+      g.addColorStop(0.2,'rgb(152,152,152)');
+      g.addColorStop(0.5,'rgb(140,140,140)');
+      g.addColorStop(1,'rgb(255,255,255)');
       ctx.fillStyle=g;
-      ctx.beginPath();
-      ctx.arc(lx,ly,R,0,Math.PI*2);
-      ctx.fill();
+      ctx.beginPath();ctx.arc(bx,by,R,0,Math.PI*2);ctx.fill();
     }
     fill(dc.toDataURL());
   }
-  function schedule(){
-    if(timer)return;
-    timer=setTimeout(function(){timer=null;render();},30);
+  function request(){
+    if(raf)return;
+    raf=true;
+    requestAnimationFrame(function(){raf=false;render();});
   }
-  window.addEventListener('mousemove',function(e){lx=e.clientX;ly=e.clientY;schedule();});
-  window.addEventListener('touchmove',function(e){var t=e.touches[0];lx=t.clientX;ly=t.clientY;schedule();},{passive:false});
-  window.addEventListener('mouseleave',function(){lx=-1;ly=-1;schedule();});
-  window.addEventListener('touchend',function(){lx=-1;ly=-1;schedule();});
+  window.addEventListener('mousemove',function(e){curX=e.clientX;curY=e.clientY;request();});
+  window.addEventListener('touchmove',function(e){var t=e.touches[0];curX=t.clientX;curY=t.clientY;request();},{passive:false});
+  window.addEventListener('mouseleave',function(){curX=-1;curY=-1;request();});
+  window.addEventListener('touchend',function(){curX=-1;curY=-1;request();});
   window.addEventListener('resize',size);
   size();
 })();
