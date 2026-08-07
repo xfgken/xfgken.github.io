@@ -33,6 +33,9 @@ body{
 .topbar .avatar{width:58px;height:58px;border-radius:16px;background:#f5b800;object-fit:cover;flex-shrink:0;border:1px solid #f0e6c8;}
 .topbar .meta h1{font-size:23px;font-weight:600;letter-spacing:.3px;display:inline;white-space:nowrap;}
 .topbar .meta p{font-size:13px;color:var(--text-sub);margin-top:2px;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.tag{display:inline-flex;align-items:center;gap:4px;background:var(--chip-bg);color:var(--chip-text);font-size:12px;padding:4px 10px;border-radius:8px;font-weight:500;}
+.tag svg{width:12px;height:12px;color:var(--primary-deep);}
 
 /* 打字光标 - 闪烁 */
 .cursor{
@@ -98,7 +101,12 @@ footer{text-align:center;color:#b8a879;font-size:13px;margin-top:16px;padding-to
     <img class="avatar" src="https://xfgken.github.io/lemon.png" alt="xfgken">
     <div class="meta">
       <h1><span id="typed"></span><span class="cursor"></span></h1>
-      <p>热爱简约 · 喜欢折腾 Linux</p>
+      <div class="tags">
+        <span class="tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>简约</span>
+        <span class="tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>折腾</span>
+        <span class="tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>思考</span>
+        <span class="tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>记录</span>
+      </div>
     </div>
   </div>
 
@@ -106,7 +114,6 @@ footer{text-align:center;color:#b8a879;font-size:13px;margin-top:16px;padding-to
   <div class="section">
     <div class="stitle"><span class="sline"></span>关于我</div>
     <div class="card about">
-      <p>崇尚简洁，习惯将复杂沉淀为最简单的形态。</p>
       <p>永远相信美好的事情即将发生。</p>
     </div>
   </div>
@@ -164,21 +171,25 @@ type();
   function size(){W=fx.width=window.innerWidth;H=fx.height=window.innerHeight;}
   size();window.addEventListener('resize',size);
   var parts=[];
-  // 40ms 自动从一个随机点发射，让效果持续可见
+  // 自动从一个随机点发射，让效果持续可见
   setInterval(function(){
     spawn(Math.random()*W, Math.random()*H);
-  }, 400);
+  }, 260);
   function spawn(x,y){
-    for(var i=0;i<22;i++){
+    for(var i=0;i<20;i++){
       var a=Math.random()*Math.PI*2;
-      var s=Math.random()*2.6+1.6;
-      parts.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,decay:0.022+Math.random()*0.022});
+      var s=Math.random()*3.2+1.8;
+      var col=Math.random()<0.65?'rgba(245,184,0,ALPHA)':'rgba(255,255,255,ALPHA)';
+      // 初始从源点向后拉一段，形成拖尾尾迹
+      var bx=x-Math.cos(a)*(Math.random()*26+6);
+      var by=y-Math.sin(a)*(Math.random()*26+6);
+      parts.push({x:bx,y:by,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,decay:0.016+Math.random()*0.018,color:col});
     }
   }
   var px=null,py=null;
   window.addEventListener('mousemove',function(e){
     var x=e.clientX,y=e.clientY;
-    if(px!==null && Math.hypot(x-px,y-py)>14){spawn(x,y);}
+    if(px!==null && Math.hypot(x-px,y-py)>10){spawn(x,y);}
     px=x;py=y;
   });
   window.addEventListener('touchmove',function(e){
@@ -186,16 +197,19 @@ type();
   },{passive:false});
   window.addEventListener('click',function(e){spawn(e.clientX,e.clientY);});
   function loop(){
-    ctx.clearRect(0,0,W,H);
+    // 半透明覆盖产生渐变拖尾
+    ctx.fillStyle='rgba(255,253,246,0.055)';
+    ctx.fillRect(0,0,W,H);
     for(var i=parts.length-1;i>=0;i--){
       var p=parts[i];
+      var lx=p.x,ly=p.y;
       p.life-=p.decay;
       if(p.life<=0){parts.splice(i,1);continue;}
-      ctx.strokeStyle='rgba(245,184,0,'+p.life.toFixed(3)+')';
-      ctx.lineWidth=1;
-      ctx.beginPath();
-      ctx.moveTo(p.x,p.y);
       p.x+=p.vx;p.y+=p.vy;
+      ctx.strokeStyle=p.color.replace('ALPHA',p.life.toFixed(3));
+      ctx.lineWidth=1.2;
+      ctx.beginPath();
+      ctx.moveTo(lx,ly);
       ctx.lineTo(p.x,p.y);
       ctx.stroke();
     }
