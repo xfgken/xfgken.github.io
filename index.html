@@ -59,13 +59,13 @@ body{
 
 /* 卡片 - 毛玻璃 */
 .card{
-  background:rgba(255,255,255,0.28);
-  backdrop-filter:blur(28px) saturate(180%);
-  -webkit-backdrop-filter:blur(28px) saturate(180%);
-  border:1px solid rgba(255,255,255,0.45);
-  border-radius:20px;
+  background:rgba(255,255,255,0.10);
+  backdrop-filter:blur(50px) saturate(170%) contrast(110%) brightness(1.1);
+  -webkit-backdrop-filter:blur(50px) saturate(170%) contrast(110%) brightness(1.1);
+  border:1px solid rgba(255,255,255,0.30);
+  border-radius:22px;
   padding:16px 18px;
-  box-shadow:0 8px 32px rgba(180,140,30,.10), inset 0 1px 0 rgba(255,255,255,0.4);
+  box-shadow:0 10px 40px rgba(180,140,30,.12), inset 0 1px 0 rgba(255,255,255,0.35);
 }
 
 /* 关于我 */
@@ -223,19 +223,26 @@ type();
       ctx.lineTo(p.x,p.y);
       ctx.stroke();
     }
-    // 动态玻璃光斑（跟随手指位置扩散，模拟折射扭曲）
+    // 动态玻璃扭曲涟漪（跟随手指位置，模拟液态玻璃折射扭曲）
     for(var g=glints.length-1;g>=0;g--){
       var gl=glints[g];
-      gl.r += 2.4;
-      gl.alpha -= 0.022;
+      gl.r += 3;
+      gl.alpha -= 0.02;
       if(gl.alpha<=0 || gl.r>gl.maxr){glints.splice(g,1);continue;}
+      var a=gl.alpha;
+      // 中央玻璃高光
       var grad=ctx.createRadialGradient(gl.x,gl.y,0,gl.x,gl.y,gl.r);
-      grad.addColorStop(0,'rgba(255,255,255,'+gl.alpha.toFixed(3)+')');
+      grad.addColorStop(0,'rgba(255,255,255,'+(a*0.7).toFixed(3)+')');
+      grad.addColorStop(0.55,'rgba(255,255,255,'+(a*0.25).toFixed(3)+')');
       grad.addColorStop(1,'rgba(255,255,255,0)');
       ctx.fillStyle=grad;
-      ctx.beginPath();
-      ctx.arc(gl.x,gl.y,gl.r,0,Math.PI*2);
-      ctx.fill();
+      ctx.beginPath();ctx.arc(gl.x,gl.y,gl.r,0,Math.PI*2);ctx.fill();
+      // 折射扭曲环（模拟被手指压出的玻璃波纹）
+      ctx.strokeStyle='rgba(255,255,255,'+(a*0.5).toFixed(3)+')';
+      ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.arc(gl.x,gl.y,gl.r*0.4,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.arc(gl.x,gl.y,gl.r*0.72,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.arc(gl.x,gl.y,gl.r*0.95,0,Math.PI*2);ctx.stroke();
     }
     requestAnimationFrame(loop);
   }
