@@ -29,8 +29,8 @@ body{
 .fx{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
 /* 顶栏 */
-.topbar{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
-.topbar .avatar{width:58px;height:58px;border-radius:16px;background:#f5b800;object-fit:cover;flex-shrink:0;border:1px solid #f0e6c8;}
+.topbar{display:flex;align-items:flex-start;gap:16px;margin-bottom:18px;}
+.topbar .avatar{width:78px;height:78px;border-radius:16px;background:#f5b800;object-fit:cover;flex-shrink:0;border:1px solid #f0e6c8;}
 .topbar .meta h1{font-size:23px;font-weight:600;letter-spacing:.3px;display:inline;white-space:nowrap;}
 .topbar .meta p{font-size:13px;color:var(--text-sub);margin-top:2px;}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
@@ -89,7 +89,7 @@ body{
 .contact .t{font-size:14px;color:var(--text-sub);}
 .contact .t b{display:block;font-size:15px;color:var(--primary-deep);margin-top:2px;font-weight:600;}
 
-footer{text-align:center;color:#b8a879;font-size:13px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line);}
+footer{text-align:center;color:#b8a879;font-size:13px;margin-top:14px;padding-top:10px;border-top:1px solid var(--line);}
 </style>
 </head>
 <body>
@@ -151,7 +151,7 @@ footer{text-align:center;color:#b8a879;font-size:13px;margin-top:auto;padding-to
 
 <script>
 // 终端打字机效果 - 输入 "xfgken"
-const text = "xfgken";
+const text = "永远相信美好";
 const el = document.getElementById('typed');
 let i = 0;
 function type(){
