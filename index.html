@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>xfgken</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -18,20 +18,21 @@
   --text-sub:#5b6b83;
   --shadow:0 2px 12px rgba(180,140,30,.08);
 }
+html,body{height:100%;overflow:hidden;touch-action:none;overscroll-behavior:none;}
 body{
   font-family:'HarmonyOS Sans','MiUI',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
   background:var(--bg);
   color:var(--text);
   line-height:1.7;
 }
-.container{max-width:680px;margin:0 auto;padding:64px 24px;position:relative;z-index:1;}
+.container{max-width:680px;margin:0 auto;padding:26px 24px;position:relative;z-index:1;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;}
 .fx{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
 /* 顶栏 */
-.topbar{display:flex;align-items:center;gap:20px;margin-bottom:44px;}
-.topbar .avatar{width:72px;height:72px;border-radius:16px;background:#f5b800;object-fit:cover;flex-shrink:0;border:1px solid #f0e6c8;}
-.topbar .meta h1{font-size:26px;font-weight:600;letter-spacing:.3px;display:inline;white-space:nowrap;}
-.topbar .meta p{font-size:14px;color:var(--text-sub);margin-top:4px;}
+.topbar{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+.topbar .avatar{width:58px;height:58px;border-radius:16px;background:#f5b800;object-fit:cover;flex-shrink:0;border:1px solid #f0e6c8;}
+.topbar .meta h1{font-size:23px;font-weight:600;letter-spacing:.3px;display:inline;white-space:nowrap;}
+.topbar .meta p{font-size:13px;color:var(--text-sub);margin-top:2px;}
 
 /* 打字光标 - 闪烁 */
 .cursor{
@@ -49,12 +50,12 @@ body{
 }
 
 /* 区块 */
-.section{margin-bottom:40px;}
-.section .stitle{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px;}
+.section{margin-bottom:16px;}
+.section .stitle{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--text);margin-bottom:10px;}
 .section .stitle .sline{width:3px;height:16px;background:var(--primary);border-radius:2px;}
 
 /* 卡片 */
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
 
 /* 关于我 */
 .about p{color:#46536b;font-size:15px;}
@@ -85,7 +86,7 @@ body{
 .contact .t{font-size:14px;color:var(--text-sub);}
 .contact .t b{display:block;font-size:15px;color:var(--primary-deep);margin-top:2px;font-weight:600;}
 
-footer{text-align:center;color:#b8a879;font-size:13px;margin-top:48px;padding-top:24px;border-top:1px solid var(--line);}
+footer{text-align:center;color:#b8a879;font-size:13px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line);}
 </style>
 </head>
 <body>
@@ -106,14 +107,7 @@ footer{text-align:center;color:#b8a879;font-size:13px;margin-top:48px;padding-to
     <div class="stitle"><span class="sline"></span>关于我</div>
     <div class="card about">
       <p>崇尚简洁，习惯将复杂沉淀为最简单的形态。</p>
-      <p>在 Linux 的终端里安静琢磨，享受一行命令带来的秩序与快感。</p>
-      <p>不爱喧嚣，倾向用作品说话——稳、静、可靠。</p>
-      <div class="chips">
-        <span>极简主义</span>
-        <span>Linux</span>
-        <span>自动化脚本</span>
-        <span>网络与安全</span>
-      </div>
+      <p>永远相信美好的事情即将发生。</p>
     </div>
   </div>
 
@@ -125,7 +119,7 @@ footer{text-align:center;color:#b8a879;font-size:13px;margin-top:48px;padding-to
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
         <span class="pname">hysteria2_quick_script</span>
       </div>
-      <p>一款基于 Bash 的 Hysteria2 一键管理脚本，专注于快速、简约、轻量，内置混淆能力，无需域名即可部署，一条命令即可完成安装、配置与服务管理。</p>
+      <p>基于 Bash 的 Hysteria2 一键管理脚本，专注快速、简约、轻量，内置混淆，无需域名即可部署。</p>
       <div class="btns">
         <a class="btn" href="https://github.com/xfgken/hysteria2_quick_script">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
