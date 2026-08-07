@@ -3,179 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>xfgken · 个人主页</title>
+<title>xfgken</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --primary:#3b82f6;      /* 小米系统主蓝 */
-  --primary-light:#60a5fa;
-  --primary-soft:#eaf2ff;   /* 浅蓝背景 */
-  --primary-bg:#dbeafe;
-  --bg:#f4f6fb;             /* 浅色页面背景 */
-  --card:#ffffff;           /* 白色卡片 */
+  --primary:#3b82f6;
+  --primary-deep:#2563eb;
+  --line:#e6edf7;
+  --bg:#f6f8fc;
+  --card:#ffffff;
   --text:#1a2233;
   --text-sub:#5b6b83;
-  --shadow:0 10px 30px rgba(59,130,246,.08), 0 4px 12px rgba(0,0,0,.04);
+  --shadow:0 2px 12px rgba(30,60,120,.06);
 }
 body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'HarmonyOS Sans','PingFang SC','MiUI','Microsoft YaHei',sans-serif;
+  font-family:'HarmonyOS Sans','MiUI',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
   background:var(--bg);
-  background-image:radial-gradient(circle at 20% 0%,#e8f1ff 0%,transparent 40%),radial-gradient(circle at 90% 10%,#e0eeff 0%,transparent 35%);
   color:var(--text);
-  min-height:100vh;
-  overflow-x:hidden;
+  line-height:1.7;
 }
-.container{max-width:760px;margin:0 auto;padding:48px 22px 20px;}
+.container{max-width:680px;margin:0 auto;padding:64px 24px;}
 
-/* ===== 头像区 - 小米控制中心风格大卡 ===== */
-.hero{
-  background:linear-gradient(145deg,#ffffff,#f0f6ff);
-  border-radius:28px;
-  padding:40px 28px;
-  text-align:center;
-  box-shadow:var(--shadow);
-  position:relative;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.9);
-}
-.hero:before{
-  content:'';position:absolute;top:-60px;right:-40px;width:200px;height:200px;
-  background:radial-gradient(circle,rgba(96,165,250,.18),transparent 65%);border-radius:50%;
-}
-.avatar{
-  width:96px;height:96px;border-radius:50%;
-  background:linear-gradient(135deg,#60a5fa,#3b82f6);
-  display:flex;align-items:center;justify-content:center;
-  font-size:40px;font-weight:700;color:#fff;
-  margin:0 auto 18px;
-  box-shadow:0 8px 24px rgba(59,130,246,.35);
-}
-.hero h1{font-size:30px;font-weight:700;letter-spacing:.5px;}
-.hero .sub{color:var(--text-sub);font-size:15px;margin-top:8px;}
-.hero .tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px;}
-.hero .tags span{
-  background:var(--primary-bg);color:var(--primary);
-  font-size:13px;padding:6px 16px;border-radius:30px;
-  font-weight:500;
-}
-.hero .tags span.alt{background:#f0f4ff;color:#3a6df0;}
+/* 顶栏 */
+.topbar{display:flex;align-items:center;gap:16px;margin-bottom:40px;}
+.topbar .avatar{width:56px;height:56px;border-radius:16px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;flex-shrink:0;}
+.topbar .meta h1{font-size:24px;font-weight:600;letter-spacing:.3px;}
+.topbar .meta p{font-size:14px;color:var(--text-sub);margin-top:2px;}
 
-/* ===== 通用卡片 - 小米毛玻璃圆角卡片 ===== */
-.card{
-  background:rgba(255,255,255,.82);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  border-radius:24px;
-  padding:26px 24px;
-  margin-top:20px;
-  box-shadow:var(--shadow);
-  border:1px solid rgba(255,255,255,.85);
-}
-.card h2{
-  font-size:18px;font-weight:600;color:var(--text);
-  display:flex;align-items:center;gap:8px;margin-bottom:16px;
-}
-.card h2 .dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#60a5fa,#3b82f6);display:inline-block;}
-.card p{color:var(--text-sub);line-height:1.9;font-size:15px;}
+/* 区块 */
+.section{margin-bottom:40px;}
+.section .stitle{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px;}
+.section .stitle .sline{width:3px;height:16px;background:var(--primary);border-radius:2px;}
+
+/* 卡片 - 平实白卡，细边框，少阴影 */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;}
 
 /* 关于我 - 深沉 */
-.about p{color:#46536b;font-weight:400;text-align:justify;}
-.about p + p{margin-top:8px;}
+.about p{color:#46536b;font-size:15px;}
+.about p + p{margin-top:10px;}
 
-/* 项目卡片 */
-.proj{
-  background:var(--card);border-radius:20px;padding:22px 20px;
-  border:1px solid #eef3fc;position:relative;
-  transition:transform .2s ease;
-}
-.proj:hover{transform:translateY(-3px);}
-.proj .phead{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.proj .pico{width:36px;height:36px;border-radius:12px;background:var(--primary-soft);display:flex;align-items:center;justify-content:center;font-size:20px;}
+/* 标签 */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.chips span{background:#f0f5ff;color:var(--primary-deep);font-size:13px;padding:6px 14px;border-radius:8px;font-weight:500;}
+
+/* 项目 */
+.proj .phead{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.proj .phead svg{color:var(--primary);}
 .proj .pname{font-size:17px;font-weight:600;}
-.proj p{color:var(--text-sub);font-size:14px;line-height:1.8;margin-bottom:12px;}
-.proj .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
-.proj .chips span{background:var(--primary-bg);color:#2563eb;font-size:12px;padding:4px 12px;border-radius:20px;font-weight:500;}
+.proj p{color:var(--text-sub);font-size:14px;margin-bottom:16px;}
 .proj .btns{display:flex;gap:10px;}
-/* 按钮 - 小米胶囊按钮 */
 .btn{
-  display:inline-flex;align-items:center;gap:6px;
-  background:linear-gradient(135deg,#60a5fa,#3b82f6);
-  color:#fff;text-decoration:none;
-  padding:10px 20px;border-radius:30px;
-  font-size:14px;font-weight:500;
-  box-shadow:0 6px 16px rgba(59,130,246,.3);
-  transition:.2s;
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--primary);color:#fff;border:none;
+  padding:9px 20px;border-radius:8px;font-size:14px;font-weight:500;
+  text-decoration:none;cursor:pointer;
 }
-.btn:hover{filter:brightness(1.05);box-shadow:0 8px 20px rgba(59,130,246,.4);}
-.btn.ghost{background:#fff;color:var(--primary);box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid var(--primary-light);}
-.btn.ghost:hover{background:var(--bg);}
+.btn:hover{background:var(--primary-deep);}
+.btn svg{width:16px;height:16px;}
 
-/* 联系 - 邮箱卡片 */
-.contact{
-  display:flex;align-items:center;gap:14px;
-  background:linear-gradient(135deg,#f0f7ff,#e6f0ff);
-  border-radius:18px;padding:16px 18px;
-}
-.contact .cico{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#60a5fa,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0;}
-.contact .ctext{font-size:14px;color:var(--text-sub);}
-.contact .ctext b{display:block;font-size:15px;color:#2563eb;margin-top:2px;font-weight:500;}
+/* 联系 */
+.contact{display:flex;align-items:center;gap:14px;}
+.contact svg{color:var(--primary);flex-shrink:0;}
+.contact .t{font-size:14px;color:var(--text-sub);}
+.contact .t b{display:block;font-size:15px;color:var(--primary-deep);margin-top:2px;font-weight:500;}
 
-footer{text-align:center;color:#9aa8bd;font-size:13px;padding:26px 0 8px;}
+footer{text-align:center;color:#9aa8bd;font-size:13px;margin-top:48px;padding-top:24px;border-top:1px solid var(--line);}
 </style>
 </head>
 <body>
 <div class="container">
 
-  <!-- 头像区 -->
-  <div class="hero">
+  <!-- 顶栏 -->
+  <div class="topbar">
     <div class="avatar">X</div>
-    <h1>xfgken</h1>
-    <div class="sub">热爱简约 · 喜欢折腾 Linux</div>
-    <div class="tags">
-      <span>🌿 极简主义者</span>
-      <span class="alt">🐧 Linux</span>
-      <span>⚙️ 折腾党</span>
-      <span class="alt">🔒 安全感</span>
+    <div class="meta">
+      <h1>xfgken</h1>
+      <p>热爱简约 · 喜欢折腾 Linux</p>
     </div>
   </div>
 
   <!-- 关于我 -->
-  <div class="card about">
-    <h2><span class="dot"></span>关于我</h2>
-    <p>崇尚简洁，习惯把复杂的事物沉淀为最简单的形态。</p>
-    <p>在 Linux 的终端世界里安静地琢磨，享受一行命令带来的秩序与快感。</p>
-    <p>不爱喧嚣，倾向用作品说话——稳、静、可靠。</p>
+  <div class="section">
+    <div class="stitle"><span class="sline"></span>关于我</div>
+    <div class="card about">
+      <p>崇尚简洁，习惯将复杂沉淀为最简单的形态。</p>
+      <p>在 Linux 的终端里安静琢磨，享受一行命令带来的秩序与快感。</p>
+      <p>不爱喧嚣，倾向用作品说话——稳、静、可靠。</p>
+      <div class="chips">
+        <span>极简主义</span>
+        <span>Linux</span>
+        <span>自动化脚本</span>
+        <span>网络与安全</span>
+      </div>
+    </div>
   </div>
 
   <!-- 项目 -->
-  <div class="card">
-    <h2><span class="dot"></span>项目 · HY2</h2>
-    <div class="proj">
+  <div class="section">
+    <div class="stitle"><span class="sline"></span>项目</div>
+    <div class="card proj">
       <div class="phead">
-        <div class="pico">🛰️</div>
-        <div class="pname">hysteria2_quick_script</div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span class="pname">hysteria2_quick_script</span>
       </div>
-      <p>一款基于 Bash 的 Hysteria2 一键管理脚本，专注极速、简约、轻量，内置混淆能力，无需域名即可快速部署，一条命令完成安装、配置与服务管理。</p>
-      <div class="chips">
-        <span>Hysteria2</span><span>Bash</span><span>QUIC</span><span>混淆</span>
-      </div>
+      <p>一款基于 Bash 的 Hysteria2 一键管理脚本，专注于快速、简约、轻量，内置混淆能力，无需域名即可部署，一条命令即可完成安装、配置与服务管理。</p>
       <div class="btns">
-        <a class="btn" href="https://github.com/xfgken/hysteria2_quick_script">GitHub 仓库</a>
-        <a class="btn ghost" href="https://xfgken.github.io/hysteria2_quick_script/">项目展示</a>
+        <a class="btn" href="https://github.com/xfgken/hysteria2_quick_script">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          GitHub 仓库
+        </a>
       </div>
     </div>
   </div>
 
   <!-- 联系我 -->
-  <div class="card">
-    <h2><span class="dot"></span>联系我</h2>
-    <a class="contact" href="mailto:xfgken@gmail.com" style="text-decoration:none;">
-      <div class="cico">✉️</div>
-      <div class="ctext">欢迎交流，可通过邮箱联系<b>xfgken@gmail.com</b></div>
-    </a>
+  <div class="section">
+    <div class="stitle"><span class="sline"></span>联系我</div>
+    <div class="card">
+      <a class="contact" href="mailto:xfgken@gmail.com" style="text-decoration:none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div class="t">欢迎交流，可通过邮箱联系<b>xfgken@gmail.com</b></div>
+      </a>
+    </div>
   </div>
 
-  <footer>© xfgken · Powered by GitHub Pages</footer>
+  <footer>© 2026 xfgken · GitHub Pages</footer>
 </div>
 </body>
 </html>
