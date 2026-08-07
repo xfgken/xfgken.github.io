@@ -98,9 +98,21 @@ body{
 .contact .t b{display:block;font-size:15px;color:var(--primary-deep);margin-top:2px;font-weight:600;}
 
 footer{text-align:center;color:#b8a879;font-size:13px;margin-top:14px;padding-top:10px;border-top:1px solid var(--line);}
+
+/* 透镜滤镜作用层 */
+#stage{position:fixed;inset:0;filter:url(#lens);-webkit-filter:url(#lens);}
 </style>
 </head>
 <body>
+<!-- SVG 凸透镜滤镜：feDisplacementMap 按位移图扭曲真实像素 -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <filter id="lens">
+  <feImage id="distImg" result="dist" preserveAspectRatio="none"/>
+  <feGaussianBlur in="dist" stdDeviation="9" result="blur"/>
+  <feDisplacementMap in="SourceGraphic" in2="blur" scale="100" xChannelSelector="R" yChannelSelector="G"/>
+</filter>
+</svg>
+<div id="stage">
 <canvas class="fx" id="fx"></canvas>
 <div class="container">
 
@@ -156,6 +168,8 @@ footer{text-align:center;color:#b8a879;font-size:13px;margin-top:14px;padding-to
 
   <footer>© 2026 xfgken · GitHub Pages</footer>
 </div>
+</div>
+<canvas id="dist" style="display:none"></canvas>
 
 <script>
 // 终端打字机效果 - 输入 "xfgken"
@@ -247,6 +261,52 @@ type();
     requestAnimationFrame(loop);
   }
   loop();
+})();
+
+/* ===== 凸透镜位移滤镜（跟随手指，成像一角扭曲放大） ===== */
+(function(){
+  var svgImg=document.getElementById('distImg');
+  var dc=document.getElementById('dist');
+  var ctx=dc.getContext('2d');
+  var dw,dh,lx=-1,ly=-1,timer=null;
+  function size(){
+    dw=dc.width=window.innerWidth;
+    dh=dc.height=window.innerHeight;
+    lx=-1;ly=-1;render();
+  }
+  function fill(href){
+    try{ svgImg.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',href); }
+    catch(e){}
+    try{ svgImg.setAttribute('href',href); }catch(e){}
+  }
+  function render(){
+    // 底色中灰(128) = 零位移（画面不动）
+    ctx.fillStyle='rgb(128,128,128)';
+    ctx.fillRect(0,0,dw,dh);
+    if(lx>=0){
+      var R=Math.max(90,Math.min(dw,dh)*0.18); // 透镜半径
+      var g=ctx.createRadialGradient(lx,ly,0,lx,ly,R);
+      g.addColorStop(0,'rgb(128,128,128)');
+      g.addColorStop(0.12,'rgb(160,160,160)');
+      g.addColorStop(0.45,'rgb(140,140,140)');
+      g.addColorStop(1,'rgb(255,255,255)'); // 边缘最大位移 → 反向扩张
+      ctx.fillStyle=g;
+      ctx.beginPath();
+      ctx.arc(lx,ly,R,0,Math.PI*2);
+      ctx.fill();
+    }
+    fill(dc.toDataURL());
+  }
+  function schedule(){
+    if(timer)return;
+    timer=setTimeout(function(){timer=null;render();},30);
+  }
+  window.addEventListener('mousemove',function(e){lx=e.clientX;ly=e.clientY;schedule();});
+  window.addEventListener('touchmove',function(e){var t=e.touches[0];lx=t.clientX;ly=t.clientY;schedule();},{passive:false});
+  window.addEventListener('mouseleave',function(){lx=-1;ly=-1;schedule();});
+  window.addEventListener('touchend',function(){lx=-1;ly=-1;schedule();});
+  window.addEventListener('resize',size);
+  size();
 })();
 </script>
 </body>
