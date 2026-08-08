@@ -178,15 +178,15 @@ type();
   function size(){W=fx.width=window.innerWidth;H=fx.height=window.innerHeight;}
   size();window.addEventListener('resize',size);
   var parts=[];
-  var waves=[];
+  var MAXP=280;
   // 自动从一个随机点发射，让效果持续可见
   setInterval(function(){
     spawn(Math.random()*W, Math.random()*H);
   }, 260);
   function spawn(x,y){
-    // 水波纹：手指处泛起一圈扩散涟漪
-    waves.push({x:x,y:y,r:2,t:0,dur:48,speed:Math.random()*2.2+2.6,seed:Math.random()*6.28});
-    for(var i=0;i<20;i++){
+    // 控制粒子总数，防止堆积卡顿
+    if(parts.length>MAXP-14) parts.splice(0,parts.length-MAXP+14);
+    for(var i=0;i<14;i++){
       var a=Math.random()*Math.PI*2;
       var s=Math.random()*3.2+1.8;
       var col=Math.random()<0.65?'rgba(245,184,0,ALPHA)':'rgba(255,255,255,ALPHA)';
@@ -222,30 +222,6 @@ type();
       ctx.moveTo(lx,ly);
       ctx.lineTo(p.x,p.y);
       ctx.stroke();
-    }
-    // 水波纹：手指处泛起扩散涟漪，飘动两下后淡出
-    for(var g=waves.length-1;g>=0;g--){
-      var w=waves[g];
-      w.t++;
-      w.r += w.speed;
-      if(w.t>w.dur){waves.splice(g,1);continue;}
-      var fade=1-(w.t/w.dur);          // 整体渐隐
-      var base=w.t*w.speed;            // 当前主环半径
-      for(var j=0;j<3;j++){
-        var rr=base+j*20;
-        var fr=fade*(1-j*0.22);
-        if(fr<=0.02)continue;
-        // 亮暗正弦波动，形成水面"飘动"感
-        var wave=Math.sin((w.t*0.5)+w.seed+j*1.2);
-        var a1=Math.max(0,fr*Math.abs(wave)*0.9);
-        var a2=Math.max(0,fr*(1-Math.abs(wave))*0.5);
-        ctx.strokeStyle='rgba(255,255,255,'+a1.toFixed(3)+')';
-        ctx.lineWidth=1.4;
-        ctx.beginPath();ctx.arc(w.x,w.y,rr+2,0,Math.PI*2);ctx.stroke();
-        ctx.strokeStyle='rgba(245,184,0,'+a2.toFixed(3)+')';
-        ctx.lineWidth=1.1;
-        ctx.beginPath();ctx.arc(w.x,w.y,rr,0,Math.PI*2);ctx.stroke();
-      }
     }
     requestAnimationFrame(loop);
   }
