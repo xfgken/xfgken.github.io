@@ -98,6 +98,17 @@ body{
 .contact .t b{display:block;font-size:15px;color:var(--primary-deep);margin-top:2px;font-weight:600;}
 
 footer{text-align:center;color:#b8a879;font-size:13px;margin-top:14px;padding-top:10px;border-top:1px solid var(--line);}
+
+/* IP 检测 */
+.ip-card{text-align:center;}
+.ip-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0;font-size:14px;}
+.ip-label{color:var(--text-sub);font-weight:500;}
+.ip-val{font-weight:700;color:var(--primary-deep);font-family:'Consolas','Menlo',monospace;letter-spacing:.5px;font-size:15px;}
+.ip-hint{font-size:12px;color:var(--text-sub);margin-top:8px;opacity:.8;}
+.ip-btn{margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:var(--primary);color:#fff;border:none;padding:7px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;}
+.ip-btn:hover{background:var(--primary-deep);}
+.ip-loading{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-1px;}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -151,6 +162,20 @@ footer{text-align:center;color:#b8a879;font-size:13px;margin-top:14px;padding-to
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         <div class="t">欢迎交流，可通过邮箱联系<b>xfgken@gmail.com</b></div>
       </a>
+    </div>
+  </div>
+
+  <!-- 本机局域网 IP 检测 -->
+  <div class="section">
+    <div class="stitle"><span class="sline"></span>本机信息</div>
+    <div class="card ip-card">
+      <div class="ip-row" id="ipRow" style="display:none;">
+        <span class="ip-label">局域网 IP</span>
+        <span class="ip-val" id="ipVal">--</span>
+      </div>
+      <div class="ip-row"><span class="ip-label" id="ipStatus">正在检测本机局域网 IP…</span></div>
+      <div class="ip-hint">通过 WebRTC 检测当前设备所在局域网的 IPv4 地址</div>
+      <button class="ip-btn" id="ipBtn"><span id="ipBtnTxt">重新检测</span></button>
     </div>
   </div>
 
@@ -226,6 +251,76 @@ type();
     requestAnimationFrame(loop);
   }
   loop();
+})();
+
+/* ===== 本机局域网 IP 检测（WebRTC） ===== */
+(function(){
+  var row=document.getElementById('ipRow');
+  var val=document.getElementById('ipVal');
+  var st=document.getElementById('ipStatus');
+  var btn=document.getElementById('ipBtn');
+  var btnTxt=document.getElementById('ipBtnTxt');
+
+  function isPrivate(ip){
+    var p=ip.split('.').map(Number);
+    if(p.length!==4) return false;
+    if(p[0]===10) return true;
+    if(p[0]===172 && p[1]>=16 && p[1]<=31) return true;
+    if(p[0]===192 && p[1]===168) return true;
+    return false;
+  }
+
+  function detect(){
+    st.style.display='';
+    st.innerHTML='正在检测本机局域网 IP…';
+    row.style.display='none';
+    btnTxt.innerHTML='<span class="ip-loading"></span> 检测中';
+    btn.disabled=true;
+    var found=null;
+    // WebRTC 暴露本机候选地址
+    try{
+      var pc=new (window.RTCPeerConnection||window.webkitRTCPeerConnection||window.mozRTCPeerConnection)({iceServers:[]});
+      pc.createDataChannel('');
+      pc.createOffer().then(function(offer){ pc.setLocalDescription(offer); }).catch(function(){});
+      pc.onicecandidate=function(e){
+        if(!e.candidate) return;
+        var m=/udp ([\d\.]+):\d+/.exec(e.candidate.candidate)||/([\d\.]+):\d+/.exec(e.candidate.candidate);
+        if(!m) return;
+        var ip=m[1];
+        if(ip.indexOf('192.168')===0||ip.indexOf('10.')===0||ip.indexOf('172.')===0){
+          if(!found||isPrivate(ip)) found=ip;
+        }
+      };
+      setTimeout(function(){
+        finish();
+      },1200);
+    }catch(err){
+      fail();
+    }
+    function finish(){
+      try{ if(pc && pc.close) pc.close(); }catch(e){}
+      if(found){
+        val.textContent=found;
+        row.style.display='flex';
+        st.style.display='none';
+        st.innerHTML='';
+        btnTxt.textContent='重新检测';
+        btn.disabled=false;
+      }else{
+        fail();
+      }
+    }
+    function fail(){
+      st.style.display='';
+      st.innerHTML='未检测到（浏览器可能隐藏了局域网 IP）';
+      row.style.display='none';
+      btnTxt.textContent='再试一次';
+      btn.disabled=false;
+    }
+  }
+
+  btn.addEventListener('click',detect);
+  detect();
 })();
 </script>
 </body>
