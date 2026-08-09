@@ -59,10 +59,10 @@ body{
 
 /* 卡片 - 毛玻璃 */
 .card{
-  background:linear-gradient(135deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.03) 42%, rgba(255,255,255,0.09) 100%);
-  backdrop-filter:blur(3px) saturate(120%) brightness(1.02);
-  -webkit-backdrop-filter:blur(3px) saturate(120%) brightness(1.02);
-  border:1px solid rgba(255,255,255,0.24);
+  background:linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.02) 42%, rgba(255,255,255,0.07) 100%);
+  backdrop-filter:blur(2px) saturate(115%) brightness(1.01);
+  -webkit-backdrop-filter:blur(2px) saturate(115%) brightness(1.01);
+  border:1px solid rgba(255,255,255,0.19);
   border-radius:22px;
   padding:16px 18px;
   box-shadow:0 10px 40px rgba(180,140,30,.10), inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -1px 1px rgba(255,255,255,0.3);
@@ -178,21 +178,21 @@ type();
   function size(){W=fx.width=window.innerWidth;H=fx.height=window.innerHeight;}
   size();window.addEventListener('resize',size);
   var parts=[];
-  var MAXP=460;
-  // 自动从一个随机点爆炸发射，频率更高、更密集，画面感更强
+  var MAXP=600;
+  // 自动从一个随机点爆炸发射，数量多、节奏稍缓，画面饱满
   setInterval(function(){
     spawn(Math.random()*W, Math.random()*H);
-  }, 120);
+  }, 150);
   function spawn(x,y){
     // 控制粒子总数，防止堆积卡顿
-    if(parts.length>MAXP-22) parts.splice(0,parts.length-MAXP+22);
-    for(var i=0;i<22;i++){
+    if(parts.length>MAXP-30) parts.splice(0,parts.length-MAXP+30);
+    for(var i=0;i<30;i++){
       var a=Math.random()*Math.PI*2;
-      var s=Math.random()*4.6+2.2;
+      var s=Math.random()*3.2+1.6;
       var col=Math.random()<0.65?'rgba(245,184,0,ALPHA)':'rgba(255,255,255,ALPHA)';
-      // 初始从源点向后拉一段，形成拖尾尾迹
-      var bx=x-Math.cos(a)*(Math.random()*26+6);
-      var by=y-Math.sin(a)*(Math.random()*26+6);
+      // 初始从源点向后拉一段，形成拖尾尾迹（拉开的距离加大，过程更舒展）
+      var bx=x-Math.cos(a)*(Math.random()*38+8);
+      var by=y-Math.sin(a)*(Math.random()*38+8);
       parts.push({x:bx,y:by,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,decay:0.016+Math.random()*0.018,color:col});
     }
   }
