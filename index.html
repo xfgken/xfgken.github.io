@@ -1,292 +1,124 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>设备信息工具 · xfgken</title>
+<meta charset="utf-8">
+<title>SU7 WebView权限检测</title>
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --primary:#f5b800;--primary-deep:#d9a000;--chip-bg:#fff3d2;--chip-text:#8a6d00;
-  --line:#f3e9cf;--bg:#fffdf6;--text:#1a2233;--text-sub:#5b6b83;
+body{
+font-family:sans-serif;
+background:#111;
+color:white;
+padding:20px;
 }
-html,body{height:100%;overscroll-behavior:contain;}
-body{font-family:'HarmonyOS Sans','MiUI',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;}
-.fx{position:fixed;inset:0;z-index:0;pointer-events:none;}
-.toolbar{max-width:680px;margin:0 auto;padding:20px 20px 12px;position:relative;z-index:2;}
-.toolbar .head{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
-.toolbar .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary-deep));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 20px rgba(215,165,20,.3);}
-.toolbar .logo svg{width:24px;height:24px;color:#fff;}
-.toolbar h1{font-size:22px;font-weight:900;color:var(--primary);letter-spacing:.5px;}
-.toolbar .sub{font-size:12px;color:var(--text-sub);}
-.scroll{max-width:680px;margin:0 auto;padding:4px 20px 40px;position:relative;z-index:2;}
-.ip-main{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-deep) 100%);color:#fff;border-radius:22px;padding:22px 20px;margin-bottom:16px;box-shadow:0 14px 44px rgba(215,165,20,.35);}
-.ip-main .lb{font-size:13px;opacity:.9;font-weight:600;letter-spacing:.5px;}
-.ip-main .ip{font-size:26px;font-weight:900;letter-spacing:1px;word-break:break-all;margin-top:6px;}
-.ip-main .meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:12px;opacity:.88;margin-top:10px;}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
-.btn{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;border:none;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(215,165,20,.25);}
-.btn:hover{background:var(--primary-deep);}
-.btn.ghost{background:#fff;color:var(--primary-deep);border:1px solid rgba(215,165,20,.3);box-shadow:none;}
-.btn svg{width:15px;height:15px;}
-.hint{font-size:11px;color:var(--text-sub);text-align:center;margin:-6px 0 14px;opacity:.8;}
-.sec{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin:18px 0 10px;}
-.sec .ic{width:18px;height:18px;color:var(--primary);}
-.sec .bar{flex:1;height:1px;background:var(--line);}
-.sec .tag{font-size:11px;color:var(--text-sub);font-weight:500;}
-.card{background:linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.02) 42%, rgba(255,255,255,0.07) 100%);backdrop-filter:blur(6px) saturate(120%);-webkit-backdrop-filter:blur(6px) saturate(120%);border:1px solid rgba(255,255,255,0.25);border-radius:20px;padding:6px 18px;box-shadow:0 10px 40px rgba(180,140,30,.08), inset 0 1px 1px rgba(255,255,255,0.6);}
-.item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px dashed rgba(138,109,0,.14);font-size:13px;}
-.item:last-child{border-bottom:none;}
-.item .k{color:var(--text-sub);flex-shrink:0;}
-.item .v{color:var(--text);font-weight:600;text-align:right;word-break:break-all;}
-.item .v.mono{font-family:Consolas,Menlo,monospace;}
-.perms{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-@media(max-width:520px){.perms{grid-template-columns:1fr 1fr;}}
-.perm{background:rgba(255,255,255,.5);border:1px solid rgba(215,165,20,.18);border-radius:12px;padding:10px 12px;text-align:center;}
-.perm .n{font-size:12px;font-weight:700;color:var(--text);}
-.perm .s{font-size:11px;margin-top:4px;font-weight:600;}
-.perm .s.allow{color:#2ecc71;}
-.perm .s.deny{color:#e74c3c;}
-.perm .s.prompt{color:var(--primary-deep);}
-footer{max-width:680px;margin:0 auto;text-align:center;color:#b8a879;font-size:12px;padding:18px 20px 30px;position:relative;z-index:2;}
+button{
+padding:12px;
+margin:8px;
+border-radius:10px;
+}
+.box{
+background:#222;
+padding:15px;
+border-radius:10px;
+}
 </style>
+
 </head>
+
 <body>
-<canvas class="fx" id="fx"></canvas>
 
-<div class="toolbar">
-  <div class="head">
-    <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
-    <div>
-      <h1>设备信息工具</h1>
-      <div class="sub">在线检测当前设备信息 · IP · 权限状态</div>
-    </div>
-  </div>
+<h2>🚗 小米车机 WebView 检测</h2>
+
+<div class="box" id="result">
+检测中...
 </div>
 
-<div class="scroll">
-  <div class="ip-main">
-    <div class="lb">公网 IP 地址</div>
-    <div class="ip" id="pubIp">检测中…</div>
-    <div class="meta"><span id="pubLoc">位置：--</span><span id="pubIsp">ISP：--</span><span id="netType">网络：--</span></div>
-  </div>
 
-  <div class="actions">
-    <button class="btn" onclick="scan()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>重新检测</button>
-    <button class="btn ghost" onclick="copyAll()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制全部</button>
-    <button class="btn ghost" onclick="requestLoc()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>获取定位</button>
-  </div>
+<button onclick="checkFile()">检测文件能力</button>
 
-  <div class="sec"><svg class="ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>设备与系统<span class="bar"></span><span class="tag">Navigator</span></div>
-  <div class="card">
-    <div class="item"><span class="k">操作系统</span><span class="v mono" id="os">--</span></div>
-    <div class="item"><span class="k">平台</span><span class="v mono" id="platform">--</span></div>
-    <div class="item"><span class="k">浏览器</span><span class="v" id="browser">--</span></div>
-    <div class="item"><span class="k">浏览器版本</span><span class="v mono" id="bversion">--</span></div>
-    <div class="item"><span class="k">内核/引擎</span><span class="v mono" id="engine">--</span></div>
-    <div class="item"><span class="k">移动设备</span><span class="v" id="mobile">--</span></div>
-    <div class="item"><span class="k">在线状态</span><span class="v" id="online">--</span></div>
-    <div class="item"><span class="k">完整 UA</span><span class="v mono" id="ua">--</span></div>
-  </div>
+<button onclick="openIntent()">测试系统跳转</button>
 
-  <div class="sec"><svg class="ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>IP 与网络<span class="bar"></span><span class="tag">WebRTC / Network Info</span></div>
-  <div class="card">
-    <div class="item"><span class="k">局域网 IP</span><span class="v mono" id="lanIp">--</span></div>
-    <div class="item"><span class="k">公网 IP</span><span class="v mono" id="pubIp2">--</span></div>
-    <div class="item"><span class="k">网络连接类型</span><span class="v" id="netKind">--</span></div>
-    <div class="item"><span class="k">有效类型</span><span class="v" id="netEff">--</span></div>
-    <div class="item"><span class="k">下行带宽</span><span class="v mono" id="downlink">--</span></div>
-    <div class="item"><span class="k">RTT 时延</span><span class="v mono" id="rtt">--</span></div>
-    <div class="item"><span class="k">省流量模式</span><span class="v" id="saveData">--</span></div>
-  </div>
-
-  <div class="sec"><svg class="ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg>屏幕与显示<span class="bar"></span><span class="tag">Screen</span></div>
-  <div class="card">
-    <div class="item"><span class="k">分辨率</span><span class="v mono" id="res">--</span></div>
-    <div class="item"><span class="k">可用分辨率</span><span class="v mono" id="avail">--</span></div>
-    <div class="item"><span class="k">设备像素比</span><span class="v mono" id="dpr">--</span></div>
-    <div class="item"><span class="k">颜色深度</span><span class="v mono" id="depth">--</span></div>
-    <div class="item"><span class="k">方向</span><span class="v" id="orient">--</span></div>
-  </div>
-
-  <div class="sec"><svg class="ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>硬件资源<span class="bar"></span><span class="tag">Hardware</span></div>
-  <div class="card">
-    <div class="item"><span class="k">CPU 逻辑核心</span><span class="v mono" id="cores">--</span></div>
-    <div class="item"><span class="k">CPU 型号</span><span class="v mono" id="cpuModel">浏览器不提供</span></div>
-    <div class="item"><span class="k">CPU 并发线程</span><span class="v mono" id="threads">--</span></div>
-    <div class="item"><span class="k">设备内存总量</span><span class="v mono" id="mem">--</span></div>
-    <div class="item"><span class="k">内存档位</span><span class="v mono" id="memTier">--</span></div>
-    <div class="item"><span class="k">站点存储配额</span><span class="v mono" id="quota">--</span></div>
-    <div class="item"><span class="k">站点已用空间</span><span class="v mono" id="used">--</span></div>
-    <div class="item"><span class="k">浏览语言</span><span class="v mono" id="lang">--</span></div>
-    <div class="item"><span class="k">时区</span><span class="v mono" id="tz">--</span></div>
-    <div class="item"><span class="k">当前时间</span><span class="v mono" id="now">--</span></div>
-  </div>
-
-  <div class="sec"><svg class="ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="11" x2="23" y2="13"/></svg>电池信息<span class="bar"></span><span class="tag">Battery API</span></div>
-  <div class="card">
-    <div class="item"><span class="k">电量</span><span class="v mono" id="batteryLevel">--</span></div>
-    <div class="item"><span class="k">充电状态</span><span class="v" id="batteryCharge">--</span></div>
-  </div>
-
-  <div class="sec"><svg class="ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22M9 3a9 9 0 0 1 12 12"/><path d="M5.6 5.6a13 13 0 0 0 12.8 12.8"/><path d="M8 8a5 5 0 0 1 8 8"/></svg>传感器与定位<span class="bar"></span><span class="tag">Sensors</span></div>
-  <div class="card">
-    <div class="item"><span class="k">地理位置</span><span class="v mono" id="geo">点击"获取定位"</span></div>
-    <div class="item"><span class="k">方向传感器</span><span class="v" id="orientSensor">检测中…</span></div>
-  </div>
-
-  <div class="sec"><svg class="ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>浏览器权限状态<span class="bar"></span><span class="tag">Permissions API</span></div>
-  <div class="perms" id="permsBox">检测中…</div>
-  <div class="hint">权限状态由浏览器权限 API 查询：绿=已允许 · 黄=询问 · 红=已拒绝</div>
-</div>
-
-<footer>© 2026 xfgken · 设备信息工具</footer>
 
 <script>
-/* ===== 粒子背景 ===== */
-(function(){
-  var fx=document.getElementById('fx'),ctx=fx.getContext('2d'),W,H;
-  function size(){W=fx.width=window.innerWidth;H=fx.height=window.innerHeight;}
-  size();window.addEventListener('resize',size);
-  var parts=[],MAXP=460;
-  setInterval(function(){spawn(Math.random()*W,Math.random()*H);},160);
-  function spawn(x,y){
-    if(parts.length>MAXP-24) parts.splice(0,parts.length-MAXP+24);
-    for(var i=0;i<24;i++){
-      var a=Math.random()*Math.PI*2,s=Math.random()*3+1.5;
-      var col=Math.random()<0.6?'rgba(245,184,0,ALPHA)':'rgba(255,255,255,ALPHA)';
-      parts.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,decay:0.016+Math.random()*0.016,color:col});
-    }
-  }
-  window.addEventListener('mousemove',function(e){spawn(e.clientX,e.clientY);});
-  window.addEventListener('touchmove',function(e){var t=e.touches[0];spawn(t.clientX,t.clientY);},{passive:false});
-  function loop(){
-    ctx.fillStyle='rgba(255,253,246,0.05)';ctx.fillRect(0,0,W,H);
-    for(var i=parts.length-1;i>=0;i--){
-      var p=parts[i];p.life-=p.decay;
-      if(p.life<=0){parts.splice(i,1);continue;}
-      p.x+=p.vx;p.y+=p.vy;
-      ctx.strokeStyle=p.color.replace('ALPHA',p.life.toFixed(3));ctx.lineWidth=1.2;
-      ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*3,p.y-p.vy*3);ctx.stroke();
-    }
-    requestAnimationFrame(loop);
-  }
-  loop();
-})();
 
-function $(id){return document.getElementById(id);}
-function set(id,v){var el=$(id);if(el)el.textContent=(v===undefined||v===null||v==='')?'--':v;}
+let r=document.getElementById("result");
 
-function uaInfo(){
-  var ua=navigator.userAgent,os='未知';
-  if(/android/i.test(ua))os='Android';
-  else if(/iphone|ipad|ipod/i.test(ua)){var m=ua.match(/OS (\d+[_.]\d+)/);os=m?'iOS '+m[1].replace(/_/g,'.'):'iOS';}
-  else if(/windows/i.test(ua))os='Windows';
-  else if(/mac os x/i.test(ua))os='macOS';
-  else if(/linux/i.test(ua))os='Linux';
-  var browser='未知',ver='',engine='未知';
-  if(/Edg\//i.test(ua)){browser='Edge';ver=(ua.match(/Edg\/([\d.]+)/)||[])[1];}
-  else if(/OPR\/|Opera/i.test(ua)){browser='Opera';ver=(ua.match(/OPR\/([\d.]+)/)||[])[1];}
-  else if(/Chrome\//i.test(ua)){browser='Chrome';ver=(ua.match(/Chrome\/([\d.]+)/)||[])[1];}
-  else if(/Safari\//i.test(ua)){browser='Safari';ver=(ua.match(/Version\/([\d.]+)/)||[])[1];}
-  else if(/Firefox\//i.test(ua)){browser='Firefox';ver=(ua.match(/Firefox\/([\d.]+)/)||[])[1];}
-  if(/Gecko\//i.test(ua))engine='Gecko';
-  else if(/AppleWebKit\//i.test(ua))engine='WebKit '+(ua.match(/AppleWebKit\/([\d]+)/)||[])[1]||'';
-  else if(/Trident\//i.test(ua))engine='Trident';
-  return {os:os,platform:navigator.platform||'',browser:browser,ver:ver,engine:engine,mobile:/Mobi|Android|iPhone|iPad/i.test(ua)};
+
+function add(t){
+r.innerHTML += "<br>"+t;
 }
 
-function lanIP(cb){var found=null;
-  try{var pc=new (window.RTCPeerConnection||window.webkitRTCPeerConnection)({iceServers:[]});
-  pc.createDataChannel('');pc.createOffer().then(function(o){pc.setLocalDescription(o);}).catch(function(){});
-  pc.onicecandidate=function(e){if(!e.candidate||found)return;var m=/udp ([\d\.]+):\d+/.exec(e.candidate.candidate);if(m){var ip=m[1];var p=ip.split('.').map(Number);if(p[0]===10||(p[0]===172&&p[1]>=16&&p[1]<=31)||(p[0]===192&&p[1]===168))found=ip;}};
-  setTimeout(function(){try{pc.close();}catch(e){}cb(found);},1200);}catch(e){cb(found);}
+
+// 基础信息
+
+add("UA:");
+add(navigator.userAgent);
+
+
+add("");
+
+
+if(window.Android){
+add("发现 Android JS接口");
+}else{
+add("没有发现 Android JS接口");
 }
 
-function pubInfo(){
-  fetch('https://api.ipify.org?format=json').then(function(r){return r.json();}).then(function(d){
-    set('pubIp',d.ip);set('pubIp2',d.ip);
-    fetch('https://ipapi.co/'+d.ip+'/json/').then(function(r){return r.json();}).then(function(j){
-      var loc=(j.city?j.city:'')+(j.region?', '+j.region:'')+(j.country_name?' · '+j.country_name:'');
-      set('pubLoc','位置：'+(loc||'--'));set('pubIsp','ISP：'+(j.org||j.isp||'--'));
-    }).catch(function(){});
-  }).catch(function(){set('pubIp','未获取到');set('pubIp2','--');});
+
+// 存储测试
+
+try{
+
+localStorage.test="ok";
+
+add("LocalStorage: ✔");
+
+}catch(e){
+
+add("LocalStorage: ✘");
+
 }
 
-function netInfo(){
-  var ni=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
-  if(ni){
-    set('netKind',ni.type||'--');set('netEff',ni.effectiveType||'--');
-    set('downlink',ni.downlink?ni.downlink+' Mbps':'--');set('rtt',ni.rtt?ni.rtt+' ms':'--');
-    set('saveData',ni.saveData?'开启':'关闭');
-    var map={'wifi':'Wi-Fi','cellular':'蜂窝网络','ethernet':'以太网','bluetooth':'蓝牙','none':'无网络','unknown':'未知','4g':'4G','3g':'3G','2g':'2G','slow-2g':'极慢2G','5g':'5G'};
-    set('netType','网络：'+(map[ni.effectiveType||ni.type]||ni.effectiveType||ni.type||'未知'));
-  }else set('netType','网络：不支持探测');
+
+// 文件API
+
+function checkFile(){
+
+if(window.showOpenFilePicker){
+
+add("文件选择API: ✔");
+
+}else{
+
+add("文件选择API: ✘");
+
 }
 
-function battery(){
-  if(navigator.getBattery){navigator.getBattery().then(function(b){
-    set('batteryLevel',Math.round(b.level*100)+'%');set('batteryCharge',b.charging?'充电中':'未充电');
-    b.addEventListener('levelchange',function(){set('batteryLevel',Math.round(b.level*100)+'%');});
-    b.addEventListener('chargingchange',function(){set('batteryCharge',b.charging?'充电中':'未充电');});
-  }).catch(function(){});}else{set('batteryLevel','--');set('batteryCharge','--');}
 }
 
-function sensors(){try{set('orientSensor',('ondeviceorientation' in window)?'支持':'不支持');}catch(e){set('orientSensor','不支持');}}
 
-function perms(){
-  var box=$('permsBox');
-  if(!navigator.permissions||!navigator.permissions.query){box.innerHTML='<div class="perm"><div class="n">不支持权限查询</div></div>';return;}
-  var list=[['Geolocation','地理定位'],['Camera','摄像头'],['Microphone','麦克风'],['Notifications','通知'],['Clipboard','剪切板'],['persistent-storage','持久存储'],['accelerometer','加速度计'],['gyroscope','陀螺仪'],['magnetometer','磁力计'],['ambient-light-sensor','环境光']];
-  box.innerHTML='';
-  function render(p,desc){var c=p.state==='granted'?'allow':(p.state==='denied'?'deny':'prompt');
-    var t=p.state==='granted'?'已允许':(p.state==='denied'?'已拒绝':'询问');
-    var d=document.createElement('div');d.className='perm';d.innerHTML='<div class="n">'+desc+'</div><div class="s '+c+'">'+t+'</div>';box.appendChild(d);}
-  list.forEach(function(g){try{navigator.permissions.query({name:g[0]}).then(function(p){render(p,g[1]);}).catch(function(){render({state:'prompt'},g[1]);});}catch(e){render({state:'prompt'},g[1]);}});
+// Intent测试
+
+function openIntent(){
+
+try{
+
+location.href=
+"intent://settings#Intent;scheme=android;end";
+
+add("Intent已发送");
+
+}catch(e){
+
+add("Intent失败");
+
 }
 
-function requestLoc(){
-  set('geo','请求中…');
-  navigator.geolocation.getCurrentPosition(function(pos){var c=pos.coords;
-    set('geo','纬度 '+c.latitude.toFixed(4)+' · 经度 '+c.longitude.toFixed(4)+(c.accuracy?' (±'+Math.round(c.accuracy)+'m)':''));
-  },function(err){set('geo','已拒绝 / 不可用');},{enableHighAccuracy:true,timeout:8000});
 }
 
-function copyAll(){
-  var lines=['设备信息工具报告','==============','系统: '+$('os').textContent,'平台: '+$('platform').textContent,'浏览器: '+$('browser').textContent+' '+$('bversion').textContent,'内核: '+$('engine').textContent,'移动: '+$('mobile').textContent,'在线: '+$('online').textContent,'局域网IP: '+$('lanIp').textContent,'公网IP: '+$('pubIp2').textContent,'网络: '+$('netKind').textContent+' / '+$('netEff').textContent,'分辨率: '+$('res').textContent,'像素比: '+$('dpr').textContent,'颜色深度: '+$('depth').textContent,'方向: '+$('orient').textContent,'CPU核心: '+$('cores').textContent,'内存: '+$('mem').textContent,'语言: '+$('lang').textContent,'时区: '+$('tz').textContent,'时间: '+$('now').textContent,'电量: '+$('batteryLevel').textContent+' '+$('batteryCharge').textContent,'======完整UA======',''+$('ua').textContent];
-  var t=lines.join('\n');
-  if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('已复制全部信息');}).catch(function(){prompt('复制以下内容',t);});}
-  else prompt('复制以下内容',t);
-}
 
-function scan(){
-  var u=uaInfo();
-  set('os',u.os);set('platform',u.platform||'--');set('browser',u.browser);set('bversion',u.ver||'--');
-  set('engine',u.engine);set('mobile',u.mobile?'是':'否');set('online',navigator.onLine?'在线':'离线');
-  set('ua',navigator.userAgent);
-  set('lanIp','检测中…');lanIP(function(ip){set('lanIp',ip||'未检测到');});
-  pubInfo();netInfo();
-  set('res',screen.width+' × '+screen.height);set('avail',screen.availWidth+' × '+screen.availHeight);
-  set('dpr',(window.devicePixelRatio||1).toFixed(2));set('depth',screen.colorDepth+(screen.pixelDepth?' bit':''));
-  set('orient',window.orientation!==undefined?((window.orientation===0?'竖屏':(window.orientation===90||window.orientation===-90?'横屏':'旋转'))):(window.innerHeight>=window.innerWidth?'竖屏':'横屏'));
-  var cores=navigator.hardwareConcurrency||'--';
-  set('cores',cores);set('threads',(cores!=='--'?cores*2+' 线程':'--'));
-  var mem=navigator.deviceMemory;
-  set('mem',mem?mem+' GB':'浏览器不提供');
-  var tiers={0.5:'约 512MB',1:'约 1GB',2:'约 2GB',4:'约 4GB',8:'约 8GB'};
-  set('memTier',mem?(tiers[mem]||mem+' GB档'):'--');
-  set('lang',navigator.language||'--');set('tz',Intl.DateTimeFormat().resolvedOptions().timeZone||'--');
-  set('now',new Date().toLocaleString());
-  if(navigator.storage&&navigator.storage.estimate){
-    navigator.storage.estimate().then(function(es){
-      function fmt(b){if(b===undefined||b===null)return '--';if(b>=1073741824)return (b/1073741824).toFixed(2)+' GB';if(b>=1048576)return (b/1048576).toFixed(1)+' MB';if(b>=1024)return (b/1024).toFixed(1)+' KB';return b+' B';}
-      set('quota',fmt(es.quota));set('used',fmt(es.usage));
-    }).catch(function(){set('quota','--');set('used','--');});
-  }else{set('quota','不可用');set('used','不可用');}
-  battery();sensors();perms();
-  setInterval(function(){set('now',new Date().toLocaleString());},1000);
-}
-scan();
 </script>
+
+
 </body>
 </html>
