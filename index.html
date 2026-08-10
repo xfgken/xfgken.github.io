@@ -1,374 +1,232 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-
-<title>
-SU7 WebView Scanner
-</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>xfgken</title>
 <style>
-
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --primary:#f5b800;        /* 柠檬黄主色 */
+  --primary-deep:#d9a000;   /* 深柠檬黄 */
+  --chip-bg:#fff3d2;        /* 标签浅黄 */
+  --chip-text:#8a6d00;      /* 标签深字 */
+  --line:#f3e9cf;
+  --bg:#fffdf6;             /* 奶白底 */
+  --card:#ffffff;
+  --text:#1a2233;
+  --text-sub:#5b6b83;
+  --shadow:0 2px 12px rgba(180,140,30,.08);
+}
+html,body{height:100%;overflow:hidden;touch-action:none;overscroll-behavior:none;}
 body{
-background:#000;
-color:#00ff66;
-font-family:monospace;
-padding:20px;
+  font-family:'HarmonyOS Sans','MiUI',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+}
+.container{max-width:680px;margin:0 auto;padding:24px 24px 8px;position:relative;z-index:1;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+.fx{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* 顶栏 */
+.topbar{display:flex;align-items:flex-start;gap:16px;margin-bottom:18px;}
+.topbar .avatar{width:78px;height:78px;border-radius:16px;background:#f5b800;object-fit:cover;flex-shrink:0;border:1px solid #f0e6c8;}
+.topbar .meta h1{font-size:23px;font-weight:900;letter-spacing:.3px;display:inline;white-space:nowrap;color:var(--primary);}
+.topbar .meta p{font-size:13px;color:var(--text-sub);margin-top:2px;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.tag{display:inline-flex;align-items:center;gap:4px;background:var(--chip-bg);color:var(--chip-text);font-size:12px;padding:4px 10px;border-radius:8px;font-weight:500;}
+.tag svg{width:12px;height:12px;color:var(--primary-deep);}
+
+/* 打字光标 - 闪烁 */
+.cursor{
+  display:inline-block;
+  width:0.6em;height:2px;
+  background:var(--primary);
+  vertical-align:baseline;
+  margin-left:2px;
+  border-radius:1px;
+  animation:blink 0.5s step-end infinite;
+}
+@keyframes blink{
+  0%,100%{opacity:1;}
+  50%{opacity:0;}
 }
 
-h1{
-font-size:22px;
+/* 区块 */
+.section{margin-bottom:16px;}
+.section .stitle{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--text);margin-bottom:10px;}
+.section .stitle .sline{width:3px;height:16px;background:var(--primary);border-radius:2px;}
+
+/* 卡片 - 毛玻璃 */
+.card{
+  background:linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.02) 42%, rgba(255,255,255,0.07) 100%);
+  backdrop-filter:blur(2px) saturate(115%) brightness(1.01);
+  -webkit-backdrop-filter:blur(2px) saturate(115%) brightness(1.01);
+  border:1px solid rgba(255,255,255,0.19);
+  border-radius:22px;
+  padding:16px 18px;
+  box-shadow:0 10px 40px rgba(180,140,30,.10), inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -1px 1px rgba(255,255,255,0.3);
 }
 
-.box{
+/* 关于我 */
+.about p{color:#46536b;font-size:15px;}
+.about p + p{margin-top:10px;}
 
-border:1px solid #00ff66;
-padding:15px;
-margin:15px 0;
-border-radius:8px;
+/* 标签 */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.chips span{background:var(--chip-bg);color:var(--chip-text);font-size:13px;padding:6px 14px;border-radius:8px;font-weight:500;}
 
+/* 项目 */
+.proj .phead{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.proj .phead svg{color:var(--primary);}
+.proj .pname{font-size:17px;font-weight:600;}
+.proj p{color:var(--text-sub);font-size:14px;margin-bottom:16px;}
+.proj .btns{display:flex;gap:10px;}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--primary);color:#fff;border:none;
+  padding:9px 20px;border-radius:8px;font-size:14px;font-weight:600;
+  text-decoration:none;cursor:pointer;
 }
+.btn:hover{background:var(--primary-deep);}
+.btn svg{width:16px;height:16px;}
 
-button{
+/* 联系 */
+.contact{display:flex;align-items:center;gap:14px;}
+.contact svg{color:var(--primary);flex-shrink:0;}
+.contact .t{font-size:14px;color:var(--text-sub);}
+.contact .t b{display:block;font-size:15px;color:var(--primary-deep);margin-top:2px;font-weight:600;}
 
-background:#00ff66;
-border:0;
-padding:10px 20px;
-font-size:16px;
-
-}
-
-pre{
-
-white-space:pre-wrap;
-
-}
-
+footer{text-align:center;color:#b8a879;font-size:13px;margin-top:14px;padding-top:10px;border-top:1px solid var(--line);}
 </style>
-
 </head>
-
-
 <body>
+<canvas class="fx" id="fx"></canvas>
+<div class="container">
 
+  <!-- 顶栏 -->
+  <div class="topbar">
+    <img class="avatar" src="https://xfgken.github.io/lemon.png" alt="xfgken">
+    <div class="meta">
+      <h1><span id="typed"></span><span class="cursor"></span></h1>
+      <div class="tags">
+        <span class="tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>简约</span>
+        <span class="tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>思考</span>
+        <span class="tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>记录</span>
+      </div>
+    </div>
+  </div>
 
-<h1>
-🚗 Android WebView Scanner
-</h1>
+  <!-- 关于我 -->
+  <div class="section">
+    <div class="stitle"><span class="sline"></span>我的信条</div>
+    <div class="card about">
+      <p>永远相信美好的事情即将发生。</p>
+    </div>
+  </div>
 
+  <!-- 项目 -->
+  <div class="section">
+    <div class="stitle"><span class="sline"></span>项目</div>
+    <div class="card proj">
+      <div class="phead">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span class="pname">hysteria2_quick_script</span>
+      </div>
+      <p>基于 Bash 的 Hysteria2 一键管理脚本，专注快速、简约、轻量，内置混淆，无需域名即可部署。</p>
+      <div class="btns">
+        <a class="btn" href="https://github.com/xfgken/hysteria2_quick_script">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          GitHub 仓库
+        </a>
+      </div>
+    </div>
+  </div>
 
-<button onclick="scan()">
-开始扫描
-</button>
+  <!-- 联系我 -->
+  <div class="section">
+    <div class="stitle"><span class="sline"></span>联系我</div>
+    <div class="card">
+      <a class="contact" href="mailto:xfgken@gmail.com" style="text-decoration:none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div class="t">欢迎交流，可通过邮箱联系<b>xfgken@gmail.com</b></div>
+      </a>
+    </div>
+  </div>
 
-
-<div class="box">
-<pre id="result">
-等待扫描...
-</pre>
+  <footer>© 2026 xfgken · GitHub Pages</footer>
 </div>
 
-
-
 <script>
-
-
-function log(t){
-
-document.getElementById(
-"result"
-).innerHTML += t+"\n";
-
+// 终端打字机效果 - 输入 "xfgken"
+const text = "xfgken";
+const el = document.getElementById('typed');
+let i = 0;
+function type(){
+  if(i < text.length){
+    el.textContent += text.charAt(i);
+    i++;
+    setTimeout(type, 160); // 每字 160ms
+  }
 }
-
-
-
-function scan(){
-
-
-document.getElementById(
-"result"
-).innerHTML="";
-
-
-log("===== 环境 =====");
-
-
-log(
-"UA:\n"+
-navigator.userAgent
-);
-
-
-log(
-"Platform: "+
-navigator.platform
-);
-
-
-log(
-"URL: "+
-location.href
-);
-
-
-
-log("\n===== 全局 Bridge =====");
-
-
-
-let targets=[
-
-"android",
-
-"Android",
-
-"bridge",
-
-"JSBridge",
-
-"TouTiaoJSBridge",
-
-"ToutiaoJSBridge",
-
-"byted_mixrender_native",
-
-"iesJsBridgeTransferMonitor",
-
-"scanBridge",
-
-"xiaomi",
-
-"miui",
-
-"car",
-
-"vehicle",
-
-"native"
-
-];
-
-
-
-targets.forEach(function(n){
-
-
-try{
-
-
-if(window[n]){
-
-
-log(
-"[发现] "+
-n+
-" 类型:"+
-typeof window[n]
-);
-
-
-scanObject(
-window[n],
-n
-);
-
-
-}else{
-
-
-log(
-"[无] "+
-n
-);
-
-
-}
-
-
-}catch(e){
-
-log(
-n+
-" 错误 "+
-e
-);
-
-}
-
-});
-
-
-
-log("\n===== URI能力 =====");
-
-
-let schemes=[
-
-"http://",
-
-"https://",
-
-"file://",
-
-"content://",
-
-"intent://"
-
-];
-
-
-schemes.forEach(s=>{
-
-try{
-
-let a=document.createElement("a");
-
-a.href=s;
-
-log(
-s+
-" 支持构造"
-);
-
-
-}catch(e){
-
-log(
-s+
-"失败"
-);
-
-}
-
-});
-
-
-
-
-log("\n===== 浏览器能力 =====");
-
-
-let caps=[
-
-"localStorage",
-
-"indexedDB",
-
-"File",
-
-"Blob",
-
-"WebSocket",
-
-"WebRTC",
-
-"Worker",
-
-"serviceWorker"
-
-];
-
-
-caps.forEach(c=>{
-
-
-let ok;
-
-
-try{
-
-ok=
-window[c] ||
-navigator[c];
-
-}catch(e){
-
-ok=false;
-
-}
-
-
-log(
-(c)+
-" : "+
-(ok?"存在":"不存在")
-);
-
-
-});
-
-
-
-log("\n===== 扫描完成 =====");
-
-
-
-}
-
-
-
-
-function scanObject(obj,name){
-
-
-try{
-
-
-log(
-"--- "+name+" ---"
-);
-
-
-let keys=
-Object.getOwnPropertyNames(obj);
-
-
-
-keys.forEach(k=>{
-
-
-let type;
-
-
-try{
-
-type=
-typeof obj[k];
-
-}catch(e){
-
-type="error";
-
-}
-
-
-log(
-"  "+k+
-" : "+
-type
-);
-
-
-});
-
-
-
-}catch(e){
-
-log(
-"对象读取失败"
-);
-
-}
-
-
-}
-
-
-
+type();
+
+/* ===== 背景线条粒子特效（手指/鼠标处放射线条） ===== */
+(function(){
+  var fx=document.getElementById('fx'),ctx=fx.getContext('2d');
+  var W,H;
+  function size(){W=fx.width=window.innerWidth;H=fx.height=window.innerHeight;}
+  size();window.addEventListener('resize',size);
+  var parts=[];
+  var MAXP=600;
+  // 自动从一个随机点爆炸发射，数量多、节奏稍缓，画面饱满
+  setInterval(function(){
+    spawn(Math.random()*W, Math.random()*H);
+  }, 150);
+  function spawn(x,y){
+    // 控制粒子总数，防止堆积卡顿
+    if(parts.length>MAXP-30) parts.splice(0,parts.length-MAXP+30);
+    for(var i=0;i<30;i++){
+      var a=Math.random()*Math.PI*2;
+      var s=Math.random()*3.2+1.6;
+      var col=Math.random()<0.65?'rgba(245,184,0,ALPHA)':'rgba(255,255,255,ALPHA)';
+      // 初始从源点向后拉一段，形成拖尾尾迹（拉开的距离加大，过程更舒展）
+      var bx=x-Math.cos(a)*(Math.random()*38+8);
+      var by=y-Math.sin(a)*(Math.random()*38+8);
+      parts.push({x:bx,y:by,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,decay:0.016+Math.random()*0.018,color:col});
+    }
+  }
+  var px=null,py=null;
+  window.addEventListener('mousemove',function(e){
+    var x=e.clientX,y=e.clientY;
+    if(px!==null && Math.hypot(x-px,y-py)>10){spawn(x,y);}
+    px=x;py=y;
+  });
+  window.addEventListener('touchmove',function(e){
+    var t=e.touches[0];spawn(t.clientX,t.clientY);
+  },{passive:false});
+  window.addEventListener('click',function(e){spawn(e.clientX,e.clientY);});
+  function loop(){
+    // 半透明覆盖产生渐变拖尾
+    ctx.fillStyle='rgba(255,253,246,0.055)';
+    ctx.fillRect(0,0,W,H);
+    for(var i=parts.length-1;i>=0;i--){
+      var p=parts[i];
+      var lx=p.x,ly=p.y;
+      p.life-=p.decay;
+      if(p.life<=0){parts.splice(i,1);continue;}
+      p.x+=p.vx;p.y+=p.vy;
+      ctx.strokeStyle=p.color.replace('ALPHA',p.life.toFixed(3));
+      ctx.lineWidth=1.2;
+      ctx.beginPath();
+      ctx.moveTo(lx,ly);
+      ctx.lineTo(p.x,p.y);
+      ctx.stroke();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
 </script>
-
-
 </body>
 </html>
