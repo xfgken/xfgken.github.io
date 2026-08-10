@@ -1,12 +1,185 @@
 <!DOCTYPE html>
 <html>
-<body>
-<script>
-document.write("<pre>");
-for(let k in window){
- document.write(k+"\n");
+<head>
+<meta charset="UTF-8">
+<title>Android WebView检测</title>
+<style>
+body {
+    font-family: sans-serif;
+    padding:20px;
+    background:#f5f5f5;
 }
-document.write("</pre>");
+.box {
+    background:white;
+    border-radius:15px;
+    padding:15px;
+    margin-bottom:15px;
+}
+h2 {
+    color:#4285f4;
+}
+.ok {
+    color:green;
+}
+.no {
+    color:red;
+}
+pre {
+    white-space:pre-wrap;
+}
+button {
+    padding:12px;
+    border:0;
+    border-radius:10px;
+    background:#4da3ff;
+    color:white;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🚗 Android WebView 权限检测</h2>
+
+<div class="box">
+<h3>系统信息</h3>
+<pre id="info"></pre>
+</div>
+
+
+<div class="box">
+<h3>JS接口检测</h3>
+<pre id="bridge"></pre>
+</div>
+
+
+<div class="box">
+<h3>能力测试</h3>
+<button onclick="test()">开始检测</button>
+<pre id="result"></pre>
+</div>
+
+
+<script>
+
+let info = "";
+
+info += "UserAgent:\n";
+info += navigator.userAgent+"\n\n";
+
+info += "语言:\n";
+info += navigator.language+"\n\n";
+
+info += "平台:\n";
+info += navigator.platform+"\n\n";
+
+info += "屏幕:\n";
+info += screen.width+" x "+screen.height+"\n\n";
+
+info += "Cookie:\n";
+info += navigator.cookieEnabled;
+
+
+document.getElementById("info").innerText=info;
+
+
+
+let b="";
+
+let objects=[
+"xiaomi",
+"miui",
+"car",
+"vehicle",
+"android",
+"webkit",
+"JSBridge",
+"bridge"
+];
+
+
+objects.forEach(function(o){
+
+if(window[o]){
+ b+="[存在] "+o+"\n";
+}else{
+ b+="[不存在] "+o+"\n";
+}
+
+});
+
+
+document.getElementById("bridge").innerText=b;
+
+
+
+function test(){
+
+let r="";
+
+
+// WebView版本
+r+="WebView:\n";
+r+=navigator.userAgent.match(/Chrome\/[\d.]+/)+"\n\n";
+
+
+// 文件协议
+r+="file协议:\n";
+
+if(location.protocol=="file:")
+{
+r+="支持 file://\n";
+}
+else{
+r+="当前:"+location.protocol+"\n";
+}
+
+
+// 存储
+r+="\nLocalStorage:\n";
+
+try{
+localStorage.setItem("test","ok");
+r+="可用\n";
+}catch(e){
+r+="不可用\n";
+}
+
+
+// 下载能力
+r+="\n下载API:\n";
+
+if(window.Blob){
+r+="支持\n";
+}else{
+r+="不支持\n";
+}
+
+
+// Android对象扫描
+
+r+="\n全局对象扫描:\n";
+
+for(let k in window){
+
+if(
+k.toLowerCase().includes("mi")||
+k.toLowerCase().includes("car")||
+k.toLowerCase().includes("android")
+)
+{
+r+=k+"\n";
+}
+
+}
+
+
+document.getElementById("result").innerText=r;
+
+}
+
+
 </script>
+
 </body>
 </html>
