@@ -2,226 +2,320 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<title>WebView Bridge Detector</title>
+<title>Bridge Deep Detector</title>
 
 <style>
 body{
     background:#111;
     color:#00ff66;
     font-family:monospace;
-    padding:16px;
+    padding:15px;
 }
+
 h2{
     color:white;
 }
+
+button{
+    width:100%;
+    padding:15px;
+    font-size:18px;
+    border-radius:10px;
+}
+
 .box{
     border:1px solid #00ff66;
-    border-radius:10px;
+    margin-top:15px;
     padding:12px;
-    margin:12px 0;
+    border-radius:10px;
     white-space:pre-wrap;
     word-break:break-all;
 }
-button{
-    width:100%;
-    padding:14px;
-    border:0;
-    border-radius:10px;
-    font-size:16px;
-}
 </style>
+
 </head>
 
 <body>
 
-<h2>WebView Bridge Detector</h2>
+<h2>WebView Bridge 深度检测</h2>
 
-<button onclick="scan()">开始检测</button>
+<button onclick="start()">开始检测</button>
 
 <div id="out"></div>
 
+
 <script>
 
-function print(title,text){
 
-    let d=document.createElement("div");
+function add(title,text){
 
-    d.className="box";
+    let div=document.createElement("div");
 
-    d.innerText=
-        "===== "+title+" =====\n\n"+
-        text;
+    div.className="box";
 
-    document.getElementById("out").appendChild(d);
+    div.textContent=
+    "===== "+title+" =====\n\n"+
+    text;
+
+    document.getElementById("out")
+    .appendChild(div);
+
 }
 
 
-function inspect(name,obj){
 
-    let result="";
+function scanObject(name,obj){
 
-    if(obj === undefined){
-        return name+" : undefined";
+    let r="";
+
+
+    if(obj===undefined){
+
+        return "不存在";
+
     }
 
-    if(obj === null){
-        return name+" : null";
+
+    if(obj===null){
+
+        return "null";
+
     }
 
-    result += "类型: "+typeof obj+"\n\n";
+
+    r+="类型: "+
+    typeof obj+
+    "\n\n";
+
+
+    // 自身属性
 
     try{
 
-        let keys=Object.getOwnPropertyNames(obj);
+        let keys=
+        Object.getOwnPropertyNames(obj);
 
-        result+="自身属性:\n";
+
+        r+="自身属性:\n";
+
 
         keys.forEach(function(k){
 
+            let t="";
+
             try{
 
-                result+=
-                    "  "+k+
-                    " ["+typeof obj[k]+"]\n";
+                t=typeof obj[k];
 
             }catch(e){
 
-                result+=
-                    "  "+k+
-                    " [无法读取]\n";
+                t="读取失败";
+
             }
+
+
+            r+=
+            "  "+
+            k+
+            " ["+
+            t+
+            "]\n";
 
         });
 
+
     }catch(e){
 
-        result+="读取自身属性失败\n";
+        r+="自身属性读取失败\n";
+
     }
+
+
+
+    // 原型链
 
 
     try{
 
-        let proto=Object.getPrototypeOf(obj);
+        let proto=
+        Object.getPrototypeOf(obj);
+
 
         if(proto){
 
-            let keys=
-                Object.getOwnPropertyNames(proto);
+            r+="\n原型属性:\n";
 
-            result+="\n原型属性:\n";
 
-            keys.forEach(function(k){
+            Object.getOwnPropertyNames(proto)
+            .forEach(function(k){
 
-                try{
-
-                    result+=
-                        "  "+k+
-                        " ["+typeof proto[k]+"]\n";
-
-                }catch(e){
-
-                    result+=
-                        "  "+k+
-                        " [无法读取]\n";
-                }
+                r+=
+                "  "+
+                k+
+                " ["+
+                typeof proto[k]+
+                "]\n";
 
             });
 
         }
 
+
     }catch(e){
 
-        result+="读取原型失败\n";
-    }
-
-
-    return result;
-}
-
-
-function scan(){
-
-    document.getElementById("out").innerHTML="";
-
-
-    print(
-        "UserAgent",
-        navigator.userAgent
-    );
-
-
-    print(
-        "android",
-        inspect(
-            "android",
-            window.android
-        )
-    );
-
-
-    print(
-        "ToutiaoJSBridge",
-        inspect(
-            "ToutiaoJSBridge",
-            window.ToutiaoJSBridge
-        )
-    );
-
-
-    print(
-        "byted_mixrender_native",
-        inspect(
-            "byted_mixrender_native",
-            window.byted_mixrender_native
-        )
-    );
-
-
-    print(
-        "lesJSBridgeTransferMonitor",
-        inspect(
-            "lesJSBridgeTransferMonitor",
-            window.lesJSBridgeTransferMonitor
-        )
-    );
-
-
-    print(
-        "jsIELiveTimingMonitor",
-        inspect(
-            "jsIELiveTimingMonitor",
-            window.jsIELiveTimingMonitor
-        )
-    );
-
-
-    let result="";
-
-
-    for(let key in window){
-
-        if(
-            /bridge|native|xiaomi|miui|car|vehicle|android|toutiao|byted/i
-            .test(key)
-        ){
-
-            result +=
-                key+
-                " ["+
-                typeof window[key]+
-                "]\n";
-        }
+        r+="原型读取失败\n";
 
     }
 
 
-    print(
-        "Window相关对象",
-        result
-    );
+
+    // 字符串
+
+    try{
+
+        r+="\ntoString:\n";
+
+        r+=obj.toString();
+
+    }catch(e){}
+
+
+
+    return r;
 
 }
+
+
+
+
+function start(){
+
+
+document.getElementById("out").innerHTML="";
+
+
+
+// UA
+
+add(
+"UserAgent",
+navigator.userAgent
+);
+
+
+
+// android
+
+add(
+"android",
+scanObject(
+"android",
+window.android
+)
+);
+
+
+
+// 抖音 Bridge
+
+add(
+"ToutiaoJSBridge",
+scanObject(
+"ToutiaoJSBridge",
+window.ToutiaoJSBridge
+)
+);
+
+
+
+// 字节 Native
+
+add(
+"byted_mixrender_native",
+scanObject(
+"byted_mixrender_native",
+window.byted_mixrender_native
+)
+);
+
+
+
+// 其它
+
+
+let list=[
+
+"bridge",
+"JSBridge",
+"webkit",
+"xiaomi",
+"miui",
+"car",
+"vehicle",
+"native",
+"app"
+
+];
+
+
+let r="";
+
+
+list.forEach(function(n){
+
+if(window[n]!==undefined){
+
+r+=
+n+
+" ["+
+typeof window[n]+
+"]\n";
+
+}
+
+});
+
+
+add(
+"其它全局对象",
+r||"无"
+);
+
+
+
+// 搜索window关键词
+
+
+let w="";
+
+
+for(let k in window){
+
+if(
+/bridge|native|byte|toutiao|android|car|mi/i
+.test(k)
+){
+
+w+=
+k+
+" ["+
+typeof window[k]+
+"]\n";
+
+}
+
+}
+
+
+add(
+"Window关键词搜索",
+w||"无"
+);
+
+
+
+}
+
 
 </script>
 
