@@ -1,683 +1,374 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>SU7 WebView 权限审计器</title>
+<title>
+SU7 WebView Scanner
+</title>
 
 <style>
-*{
-    box-sizing:border-box;
-}
 
 body{
-    margin:0;
-    padding:16px;
-    background:#111;
-    color:#00ff66;
-    font-family:monospace;
-    font-size:14px;
+background:#000;
+color:#00ff66;
+font-family:monospace;
+padding:20px;
 }
 
 h1{
-    color:white;
-    font-size:22px;
-}
-
-button{
-    width:100%;
-    padding:14px;
-    margin:6px 0;
-    border:0;
-    border-radius:10px;
-    font-size:16px;
+font-size:22px;
 }
 
 .box{
-    margin-top:12px;
-    padding:14px;
-    border:1px solid #00ff66;
-    border-radius:10px;
-    white-space:pre-wrap;
-    word-break:break-all;
+
+border:1px solid #00ff66;
+padding:15px;
+margin:15px 0;
+border-radius:8px;
+
 }
 
-.ok{
-    color:#00ff66;
+button{
+
+background:#00ff66;
+border:0;
+padding:10px 20px;
+font-size:16px;
+
 }
 
-.warn{
-    color:#ffff00;
+pre{
+
+white-space:pre-wrap;
+
 }
 
-.bad{
-    color:#ff5555;
-}
 </style>
+
 </head>
+
 
 <body>
 
-<h1>SU7 WebView 权限审计器</h1>
 
-<button onclick="scanAll()">开始完整检测</button>
-<button onclick="scanBridge()">重新检测 Bridge</button>
-<button onclick="clearLog()">清空</button>
+<h1>
+🚗 Android WebView Scanner
+</h1>
 
-<div id="output"></div>
+
+<button onclick="scan()">
+开始扫描
+</button>
+
+
+<div class="box">
+<pre id="result">
+等待扫描...
+</pre>
+</div>
+
 
 
 <script>
 
-const output = document.getElementById("output");
 
+function log(t){
 
-function box(title,text){
-
-    const div=document.createElement("div");
-
-    div.className="box";
-
-    div.innerText=
-        "===== "+title+" =====\n\n"+
-        text;
-
-    output.appendChild(div);
-}
-
-
-function typeOf(obj){
-
-    try{
-        return typeof obj;
-    }catch(e){
-        return "ERROR";
-    }
+document.getElementById(
+"result"
+).innerHTML += t+"\n";
 
 }
 
 
-function safeGet(obj,key){
 
-    try{
-        return obj[key];
-    }catch(e){
-        return undefined;
-    }
+function scan(){
+
+
+document.getElementById(
+"result"
+).innerHTML="";
+
+
+log("===== 环境 =====");
+
+
+log(
+"UA:\n"+
+navigator.userAgent
+);
+
+
+log(
+"Platform: "+
+navigator.platform
+);
+
+
+log(
+"URL: "+
+location.href
+);
+
+
+
+log("\n===== 全局 Bridge =====");
+
+
+
+let targets=[
+
+"android",
+
+"Android",
+
+"bridge",
+
+"JSBridge",
+
+"TouTiaoJSBridge",
+
+"ToutiaoJSBridge",
+
+"byted_mixrender_native",
+
+"iesJsBridgeTransferMonitor",
+
+"scanBridge",
+
+"xiaomi",
+
+"miui",
+
+"car",
+
+"vehicle",
+
+"native"
+
+];
+
+
+
+targets.forEach(function(n){
+
+
+try{
+
+
+if(window[n]){
+
+
+log(
+"[发现] "+
+n+
+" 类型:"+
+typeof window[n]
+);
+
+
+scanObject(
+window[n],
+n
+);
+
+
+}else{
+
+
+log(
+"[无] "+
+n
+);
+
 
 }
 
 
-/* =========================
-   基础环境
-========================= */
+}catch(e){
 
-function scanEnvironment(){
+log(
+n+
+" 错误 "+
+e
+);
 
-    let r="";
-
-    r+="UserAgent:\n";
-    r+=navigator.userAgent+"\n\n";
-
-    r+="Platform:\n";
-    r+=navigator.platform+"\n\n";
-
-    r+="Language:\n";
-    r+=navigator.language+"\n\n";
-
-    r+="Online:\n";
-    r+=navigator.onLine+"\n\n";
-
-    r+="URL:\n";
-    r+=location.href+"\n\n";
-
-    r+="Protocol:\n";
-    r+=location.protocol+"\n\n";
-
-    r+="Cookie enabled:\n";
-    r+=navigator.cookieEnabled+"\n";
-
-    box("环境",r);
 }
 
-
-/* =========================
-   Bridge检测
-========================= */
-
-function inspectObject(name,obj){
-
-    if(obj === undefined){
-        return name+" : 不存在";
-    }
-
-    if(obj === null){
-        return name+" : null";
-    }
-
-    let r="";
-
-    r+="类型: "+typeOf(obj)+"\n\n";
+});
 
 
-    try{
 
-        let keys=Object.getOwnPropertyNames(obj);
-
-        r+="自身属性:\n";
-
-        if(keys.length===0){
-            r+="  无\n";
-        }
-
-        keys.forEach(k=>{
-
-            let t;
-
-            try{
-                t=typeof obj[k];
-            }catch(e){
-                t="无法读取";
-            }
-
-            r+="  "+k+" ["+t+"]\n";
-
-        });
-
-    }catch(e){
-
-        r+="自身属性读取失败\n";
-
-    }
+log("\n===== URI能力 =====");
 
 
-    try{
+let schemes=[
 
-        let proto=Object.getPrototypeOf(obj);
+"http://",
 
-        if(proto){
+"https://",
 
-            r+="\n原型属性:\n";
+"file://",
 
-            Object.getOwnPropertyNames(proto)
-            .forEach(k=>{
+"content://",
 
-                let t;
+"intent://"
 
-                try{
-                    t=typeof proto[k];
-                }catch(e){
-                    t="无法读取";
-                }
-
-                r+="  "+k+" ["+t+"]\n";
-
-            });
-
-        }
-
-    }catch(e){
-
-        r+="原型读取失败\n";
-
-    }
+];
 
 
-    try{
+schemes.forEach(s=>{
 
-        r+="\nString:\n";
-        r+=String(obj);
+try{
 
-    }catch(e){}
+let a=document.createElement("a");
 
-    return r;
+a.href=s;
+
+log(
+s+
+" 支持构造"
+);
+
+
+}catch(e){
+
+log(
+s+
+"失败"
+);
+
 }
 
+});
 
-function scanBridge(){
 
-    box(
-        "android",
-        inspectObject(
-            "android",
-            window.android
-        )
-    );
 
 
-    box(
-        "ToutiaoJSBridge",
-        inspectObject(
-            "ToutiaoJSBridge",
-            window.ToutiaoJSBridge
-        )
-    );
+log("\n===== 浏览器能力 =====");
 
 
-    box(
-        "byted_mixrender_native",
-        inspectObject(
-            "byted_mixrender_native",
-            window.byted_mixrender_native
-        )
-    );
+let caps=[
 
+"localStorage",
 
-    let names=[
-        "bridge",
-        "JSBridge",
-        "webkit",
-        "xiaomi",
-        "miui",
-        "car",
-        "vehicle",
-        "native",
-        "app",
-        "ToutiaoJSBridge",
-        "byted_mixrender_native"
-    ];
+"indexedDB",
 
-    let r="";
+"File",
 
-    names.forEach(name=>{
+"Blob",
 
-        try{
+"WebSocket",
 
-            r+=
-                name+
-                " : "+
-                typeof window[name]+
-                "\n";
+"WebRTC",
 
-        }catch(e){
+"Worker",
 
-            r+=
-                name+
-                " : ERROR\n";
+"serviceWorker"
 
-        }
+];
 
-    });
 
-    box("常见接口",r);
-}
+caps.forEach(c=>{
 
 
-/* =========================
-   Storage
-========================= */
+let ok;
 
-function scanStorage(){
 
-    let r="";
+try{
 
-    try{
+ok=
+window[c] ||
+navigator[c];
 
-        localStorage.setItem(
-            "__su7_test",
-            "1"
-        );
+}catch(e){
 
-        r+="localStorage : 可写\n";
-
-        localStorage.removeItem(
-            "__su7_test"
-        );
-
-    }catch(e){
-
-        r+="localStorage : 不可写\n";
-
-    }
-
-
-    try{
-
-        sessionStorage.setItem(
-            "__su7_test",
-            "1"
-        );
-
-        r+="sessionStorage : 可写\n";
-
-        sessionStorage.removeItem(
-            "__su7_test"
-        );
-
-    }catch(e){
-
-        r+="sessionStorage : 不可写\n";
-
-    }
-
-
-    if(window.indexedDB){
-
-        r+="IndexedDB : 存在\n";
-
-    }else{
-
-        r+="IndexedDB : 不存在\n";
-
-    }
-
-
-    box("浏览器存储",r);
-}
-
-
-/* =========================
-   File API
-========================= */
-
-function scanFileAPI(){
-
-    let r="";
-
-    r+="File : "+
-        (window.File ? "存在" : "不存在")+
-        "\n";
-
-    r+="FileReader : "+
-        (window.FileReader ? "存在" : "不存在")+
-        "\n";
-
-    r+="Blob : "+
-        (window.Blob ? "存在" : "不存在")+
-        "\n";
-
-    r+="URL.createObjectURL : "+
-        (URL.createObjectURL ? "存在" : "不存在")+
-        "\n";
-
-    r+="showOpenFilePicker : "+
-        (window.showOpenFilePicker ?
-        "存在":"不存在")+
-        "\n";
-
-    r+="showSaveFilePicker : "+
-        (window.showSaveFilePicker ?
-        "存在":"不存在");
-
-    box("文件相关能力",r);
-}
-
-
-/* =========================
-   网络能力
-========================= */
-
-function scanNetwork(){
-
-    let r="";
-
-    r+="fetch : "+
-        (window.fetch ? "存在":"不存在")+
-        "\n";
-
-    r+="XMLHttpRequest : "+
-        (window.XMLHttpRequest ?
-        "存在":"不存在")+
-        "\n";
-
-    r+="WebSocket : "+
-        (window.WebSocket ?
-        "存在":"不存在")+
-        "\n";
-
-    r+="WebRTC : "+
-        (window.RTCPeerConnection ?
-        "存在":"不存在")+
-        "\n";
-
-    r+="ServiceWorker : "+
-        (navigator.serviceWorker ?
-        "存在":"不存在");
-
-    box("网络能力",r);
-}
-
-
-/* =========================
-   URI能力
-========================= */
-
-function scanURI(){
-
-    let schemes=[
-        "http",
-        "https",
-        "file",
-        "content",
-        "intent"
-    ];
-
-    let r="当前协议: "+
-        location.protocol+
-        "\n\n";
-
-    schemes.forEach(s=>{
-
-        r+=s+
-            ":// 可构造URI\n";
-
-    });
-
-    r+="\n注意：这里仅检测浏览器是否允许构造 URI，";
-    r+="不自动打开系统组件。";
-
-    box("URI环境",r);
-}
-
-
-/* =========================
-   权限相关API
-========================= */
-
-async function scanPermissions(){
-
-    let r="";
-
-    if(!navigator.permissions){
-
-        box(
-            "Permissions API",
-            "navigator.permissions 不存在"
-        );
-
-        return;
-    }
-
-
-    let list=[
-        "camera",
-        "microphone",
-        "geolocation",
-        "notifications",
-        "clipboard-read",
-        "clipboard-write"
-    ];
-
-
-    for(const name of list){
-
-        try{
-
-            const p=
-                await navigator.permissions.query({
-                    name:name
-                });
-
-            r+=
-                name+
-                " : "+
-                p.state+
-                "\n";
-
-        }catch(e){
-
-            r+=
-                name+
-                " : 不支持/无法查询\n";
-
-        }
-
-    }
-
-
-    box("浏览器权限",r);
-}
-
-
-/* =========================
-   Window扫描
-========================= */
-
-function scanWindow(){
-
-    let keywords=
-        /android|bridge|native|xiaomi|miui|car|vehicle|byte|toutiao/i;
-
-    let r="";
-
-
-    try{
-
-        for(const key in window){
-
-            if(keywords.test(key)){
-
-                r+=
-                    key+
-                    " ["+
-                    typeof window[key]+
-                    "]\n";
-
-            }
-
-        }
-
-    }catch(e){
-
-        r+="扫描失败";
-
-    }
-
-
-    if(!r){
-        r="没有发现关键词对象";
-    }
-
-    box("Window接口扫描",r);
-}
-
-
-/* =========================
-   安全能力总结
-========================= */
-
-function summary(){
-
-    let r="";
-
-
-    r+="Android Bridge : ";
-
-    r+=
-        window.android ?
-        "发现\n":
-        "未发现\n";
-
-
-    r+="ToutiaoJSBridge : ";
-
-    r+=
-        window.ToutiaoJSBridge ?
-        "发现\n":
-        "未发现\n";
-
-
-    r+="byted_mixrender_native : ";
-
-    r+=
-        window.byted_mixrender_native ?
-        "发现\n":
-        "未发现\n";
-
-
-    r+="\n";
-
-
-    if(window.android){
-
-        r+="⚠ Android JS Interface 存在\n";
-
-    }
-
-
-    if(window.ToutiaoJSBridge){
-
-        r+="⚠ 字节 JS Bridge 存在\n";
-
-    }
-
-
-    if(window.byted_mixrender_native){
-
-        r+="⚠ Native invoke 通道存在\n";
-
-    }
-
-
-    r+="\n本工具只做接口和权限审计，";
-    r+="不会主动调用未知 Native 方法。";
-
-
-    box("结果摘要",r);
-}
-
-
-/* =========================
-   全部检测
-========================= */
-
-async function scanAll(){
-
-    output.innerHTML="";
-
-    scanEnvironment();
-
-    scanBridge();
-
-    scanStorage();
-
-    scanFileAPI();
-
-    scanNetwork();
-
-    scanURI();
-
-    await scanPermissions();
-
-    scanWindow();
-
-    summary();
+ok=false;
 
 }
 
 
-/* =========================
-   清空
-========================= */
+log(
+(c)+
+" : "+
+(ok?"存在":"不存在")
+);
 
-function clearLog(){
 
-    output.innerHTML="";
+});
+
+
+
+log("\n===== 扫描完成 =====");
+
+
 
 }
+
+
+
+
+function scanObject(obj,name){
+
+
+try{
+
+
+log(
+"--- "+name+" ---"
+);
+
+
+let keys=
+Object.getOwnPropertyNames(obj);
+
+
+
+keys.forEach(k=>{
+
+
+let type;
+
+
+try{
+
+type=
+typeof obj[k];
+
+}catch(e){
+
+type="error";
+
+}
+
+
+log(
+"  "+k+
+" : "+
+type
+);
+
+
+});
+
+
+
+}catch(e){
+
+log(
+"对象读取失败"
+);
+
+}
+
+
+}
+
+
 
 </script>
+
 
 </body>
 </html>
