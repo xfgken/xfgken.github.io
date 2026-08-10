@@ -112,7 +112,12 @@ footer{max-width:680px;margin:0 auto;text-align:center;color:#b8a879;font-size:1
   <div class="sec"><svg class="ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>硬件资源<span class="bar"></span><span class="tag">Hardware</span></div>
   <div class="card">
     <div class="item"><span class="k">CPU 逻辑核心</span><span class="v mono" id="cores">--</span></div>
-    <div class="item"><span class="k">设备内存</span><span class="v mono" id="mem">--</span></div>
+    <div class="item"><span class="k">CPU 型号</span><span class="v mono" id="cpuModel">浏览器不提供</span></div>
+    <div class="item"><span class="k">CPU 并发线程</span><span class="v mono" id="threads">--</span></div>
+    <div class="item"><span class="k">设备内存总量</span><span class="v mono" id="mem">--</span></div>
+    <div class="item"><span class="k">内存档位</span><span class="v mono" id="memTier">--</span></div>
+    <div class="item"><span class="k">站点存储配额</span><span class="v mono" id="quota">--</span></div>
+    <div class="item"><span class="k">站点已用空间</span><span class="v mono" id="used">--</span></div>
     <div class="item"><span class="k">浏览语言</span><span class="v mono" id="lang">--</span></div>
     <div class="item"><span class="k">时区</span><span class="v mono" id="tz">--</span></div>
     <div class="item"><span class="k">当前时间</span><span class="v mono" id="now">--</span></div>
@@ -264,9 +269,20 @@ function scan(){
   set('res',screen.width+' × '+screen.height);set('avail',screen.availWidth+' × '+screen.availHeight);
   set('dpr',(window.devicePixelRatio||1).toFixed(2));set('depth',screen.colorDepth+(screen.pixelDepth?' bit':''));
   set('orient',window.orientation!==undefined?((window.orientation===0?'竖屏':(window.orientation===90||window.orientation===-90?'横屏':'旋转'))):(window.innerHeight>=window.innerWidth?'竖屏':'横屏'));
-  set('cores',navigator.hardwareConcurrency||'--');set('mem',navigator.deviceMemory?navigator.deviceMemory+' GB':'--');
+  var cores=navigator.hardwareConcurrency||'--';
+  set('cores',cores);set('threads',(cores!=='--'?cores*2+' 线程':'--'));
+  var mem=navigator.deviceMemory;
+  set('mem',mem?mem+' GB':'浏览器不提供');
+  var tiers={0.5:'约 512MB',1:'约 1GB',2:'约 2GB',4:'约 4GB',8:'约 8GB'};
+  set('memTier',mem?(tiers[mem]||mem+' GB档'):'--');
   set('lang',navigator.language||'--');set('tz',Intl.DateTimeFormat().resolvedOptions().timeZone||'--');
   set('now',new Date().toLocaleString());
+  if(navigator.storage&&navigator.storage.estimate){
+    navigator.storage.estimate().then(function(es){
+      function fmt(b){if(b===undefined||b===null)return '--';if(b>=1073741824)return (b/1073741824).toFixed(2)+' GB';if(b>=1048576)return (b/1048576).toFixed(1)+' MB';if(b>=1024)return (b/1024).toFixed(1)+' KB';return b+' B';}
+      set('quota',fmt(es.quota));set('used',fmt(es.usage));
+    }).catch(function(){set('quota','--');set('used','--');});
+  }else{set('quota','不可用');set('used','不可用');}
   battery();sensors();perms();
   setInterval(function(){set('now',new Date().toLocaleString());},1000);
 }
