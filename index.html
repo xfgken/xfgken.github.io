@@ -1,320 +1,68 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8">
-<title>Bridge Deep Detector</title>
-
-<style>
-body{
-    background:#111;
-    color:#00ff66;
-    font-family:monospace;
-    padding:15px;
-}
-
-h2{
-    color:white;
-}
-
-button{
-    width:100%;
-    padding:15px;
-    font-size:18px;
-    border-radius:10px;
-}
-
-.box{
-    border:1px solid #00ff66;
-    margin-top:15px;
-    padding:12px;
-    border-radius:10px;
-    white-space:pre-wrap;
-    word-break:break-all;
-}
-</style>
-
-</head>
-
 <body>
 
-<h2>WebView Bridge 深度检测</h2>
-
-<button onclick="start()">开始检测</button>
-
-<div id="out"></div>
-
+<pre id="o"></pre>
 
 <script>
 
+let out="";
 
-function add(title,text){
+function log(t){
+ out+=t+"\n\n";
+ document.getElementById("o").innerText=out;
+}
 
-    let div=document.createElement("div");
 
-    div.className="box";
+log("开始");
 
-    div.textContent=
-    "===== "+title+" =====\n\n"+
-    text;
 
-    document.getElementById("out")
-    .appendChild(div);
+try{
+
+if(window.byted_mixrender_native){
+
+log(
+"invoke类型:"
++
+typeof window.byted_mixrender_native.invoke
+);
+
+
+log(
+"invoke源码:"
++
+window.byted_mixrender_native.invoke.toString()
+);
+
+
+}
+
+}catch(e){
+
+log(e);
 
 }
 
 
 
-function scanObject(name,obj){
+try{
 
-    let r="";
+if(window.ToutiaoJSBridge){
 
-
-    if(obj===undefined){
-
-        return "不存在";
-
-    }
-
-
-    if(obj===null){
-
-        return "null";
-
-    }
-
-
-    r+="类型: "+
-    typeof obj+
-    "\n\n";
-
-
-    // 自身属性
-
-    try{
-
-        let keys=
-        Object.getOwnPropertyNames(obj);
-
-
-        r+="自身属性:\n";
-
-
-        keys.forEach(function(k){
-
-            let t="";
-
-            try{
-
-                t=typeof obj[k];
-
-            }catch(e){
-
-                t="读取失败";
-
-            }
-
-
-            r+=
-            "  "+
-            k+
-            " ["+
-            t+
-            "]\n";
-
-        });
-
-
-    }catch(e){
-
-        r+="自身属性读取失败\n";
-
-    }
-
-
-
-    // 原型链
-
-
-    try{
-
-        let proto=
-        Object.getPrototypeOf(obj);
-
-
-        if(proto){
-
-            r+="\n原型属性:\n";
-
-
-            Object.getOwnPropertyNames(proto)
-            .forEach(function(k){
-
-                r+=
-                "  "+
-                k+
-                " ["+
-                typeof proto[k]+
-                "]\n";
-
-            });
-
-        }
-
-
-    }catch(e){
-
-        r+="原型读取失败\n";
-
-    }
-
-
-
-    // 字符串
-
-    try{
-
-        r+="\ntoString:\n";
-
-        r+=obj.toString();
-
-    }catch(e){}
-
-
-
-    return r;
+log(
+"_invokeMethod源码:"
++
+window.ToutiaoJSBridge._invokeMethod.toString()
+);
 
 }
 
+}catch(e){
 
-
-
-function start(){
-
-
-document.getElementById("out").innerHTML="";
-
-
-
-// UA
-
-add(
-"UserAgent",
-navigator.userAgent
-);
-
-
-
-// android
-
-add(
-"android",
-scanObject(
-"android",
-window.android
-)
-);
-
-
-
-// 抖音 Bridge
-
-add(
-"ToutiaoJSBridge",
-scanObject(
-"ToutiaoJSBridge",
-window.ToutiaoJSBridge
-)
-);
-
-
-
-// 字节 Native
-
-add(
-"byted_mixrender_native",
-scanObject(
-"byted_mixrender_native",
-window.byted_mixrender_native
-)
-);
-
-
-
-// 其它
-
-
-let list=[
-
-"bridge",
-"JSBridge",
-"webkit",
-"xiaomi",
-"miui",
-"car",
-"vehicle",
-"native",
-"app"
-
-];
-
-
-let r="";
-
-
-list.forEach(function(n){
-
-if(window[n]!==undefined){
-
-r+=
-n+
-" ["+
-typeof window[n]+
-"]\n";
+log(e);
 
 }
 
-});
-
-
-add(
-"其它全局对象",
-r||"无"
-);
-
-
-
-// 搜索window关键词
-
-
-let w="";
-
-
-for(let k in window){
-
-if(
-/bridge|native|byte|toutiao|android|car|mi/i
-.test(k)
-){
-
-w+=
-k+
-" ["+
-typeof window[k]+
-"]\n";
-
-}
-
-}
-
-
-add(
-"Window关键词搜索",
-w||"无"
-);
-
-
-
-}
 
 
 </script>
