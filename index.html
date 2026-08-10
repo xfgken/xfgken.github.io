@@ -1,124 +1,12 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<title>SU7 WebView权限检测</title>
-
-<style>
-body{
-font-family:sans-serif;
-background:#111;
-color:white;
-padding:20px;
-}
-button{
-padding:12px;
-margin:8px;
-border-radius:10px;
-}
-.box{
-background:#222;
-padding:15px;
-border-radius:10px;
-}
-</style>
-
-</head>
-
 <body>
-
-<h2>🚗 小米车机 WebView 检测</h2>
-
-<div class="box" id="result">
-检测中...
-</div>
-
-
-<button onclick="checkFile()">检测文件能力</button>
-
-<button onclick="openIntent()">测试系统跳转</button>
-
-
 <script>
-
-let r=document.getElementById("result");
-
-
-function add(t){
-r.innerHTML += "<br>"+t;
+document.write("<pre>");
+for(let k in window){
+ document.write(k+"\n");
 }
-
-
-// 基础信息
-
-add("UA:");
-add(navigator.userAgent);
-
-
-add("");
-
-
-if(window.Android){
-add("发现 Android JS接口");
-}else{
-add("没有发现 Android JS接口");
-}
-
-
-// 存储测试
-
-try{
-
-localStorage.test="ok";
-
-add("LocalStorage: ✔");
-
-}catch(e){
-
-add("LocalStorage: ✘");
-
-}
-
-
-// 文件API
-
-function checkFile(){
-
-if(window.showOpenFilePicker){
-
-add("文件选择API: ✔");
-
-}else{
-
-add("文件选择API: ✘");
-
-}
-
-}
-
-
-// Intent测试
-
-function openIntent(){
-
-try{
-
-location.href=
-"intent://settings#Intent;scheme=android;end";
-
-add("Intent已发送");
-
-}catch(e){
-
-add("Intent失败");
-
-}
-
-}
-
-
+document.write("</pre>");
 </script>
-
-
 </body>
 </html>
