@@ -1,17 +1,87 @@
 <!DOCTYPE html>
 <html>
+<head>
+<meta charset="UTF-8">
+<title>Android WebView 检测工具</title>
+
+<style>
+body{
+    font-family: monospace;
+    background:#111;
+    color:#00ff88;
+    padding:20px;
+}
+
+h2{
+    color:#fff;
+}
+
+.box{
+    border:1px solid #00ff88;
+    padding:15px;
+    margin-bottom:15px;
+    border-radius:10px;
+    white-space:pre-wrap;
+}
+
+button{
+    padding:10px;
+    background:#00ff88;
+    border:0;
+    border-radius:8px;
+    font-size:16px;
+}
+</style>
+
+</head>
+
 <body>
 
-<h2>JS对象检测</h2>
+<h2>Android WebView 检测工具</h2>
 
-<pre id="out"></pre>
+<button onclick="scan()">开始检测</button>
+
+<div class="box" id="result">
+等待检测...
+</div>
 
 
 <script>
 
-let arr = [];
+function add(title,text){
 
-[
+    let box=document.createElement("div");
+    box.className="box";
+    box.innerHTML="<b>"+title+"</b>\n"+text;
+
+    document.body.appendChild(box);
+
+}
+
+
+function scan(){
+
+document.getElementById("result").innerHTML="检测中...";
+
+
+let r="";
+
+
+// 基础信息
+
+r+="UserAgent:\n";
+r+=navigator.userAgent+"\n\n";
+
+
+r+="平台:\n";
+r+=navigator.platform+"\n\n";
+
+
+
+// 常见对象
+
+let objs=[
+
 "bridge",
 "JSBridge",
 "webkit",
@@ -19,29 +89,128 @@ let arr = [];
 "miui",
 "car",
 "vehicle",
-"android"
-].forEach(function(name){
+"android",
+"native",
+"app"
 
-    let a;
+];
+
+
+r+="=== JS对象检测 ===\n";
+
+
+objs.forEach(function(o){
 
     try{
-        a = typeof window[name];
-    }catch(e){
-        a="error";
-    }
 
-    arr.push(
-        name + " : " + a
-    );
+        if(window[o]!==undefined){
+
+            r+=o+" : "+typeof window[o]+"\n";
+
+        }else{
+
+            r+=o+" : undefined\n";
+
+        }
+
+
+    }catch(e){
+
+        r+=o+" : error\n";
+
+    }
 
 });
 
 
-document.getElementById("out").innerText =
-arr.join("\n");
 
+
+// Android接口
+
+r+="\n=== Android接口 ===\n";
+
+
+if(window.android){
+
+    r+="android存在\n\n";
+
+
+    try{
+
+        let keys=Object.getOwnPropertyNames(
+            Object.getPrototypeOf(window.android)
+        );
+
+
+        keys.forEach(k=>{
+
+            r+=k+"\n";
+
+        });
+
+
+    }catch(e){
+
+        r+="无法读取接口\n";
+
+    }
+
+
+}else{
+
+    r+="没有 android 对象\n";
+
+}
+
+
+
+// window对象搜索
+
+r+="\n=== window可疑对象 ===\n";
+
+
+for(let k in window){
+
+    if(
+        k.toLowerCase()
+        .match(/android|car|mi|xiaomi|bridge|native/)
+    ){
+
+        r+=k+"\n";
+
+    }
+
+}
+
+
+
+// WebView判断
+
+r+="\n=== WebView判断 ===\n";
+
+
+if(
+navigator.userAgent.includes("wv")
+){
+
+r+="Android WebView\n";
+
+}else{
+
+r+="普通浏览器或隐藏UA\n";
+
+}
+
+
+
+document.getElementById("result").innerText=r;
+
+
+
+}
 
 </script>
+
 
 </body>
 </html>
