@@ -2,184 +2,182 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Android WebView检测</title>
+<title>Bridge检测</title>
+
 <style>
-body {
-    font-family: sans-serif;
+body{
+    font-family: Arial,"Microsoft YaHei";
     padding:20px;
     background:#f5f5f5;
 }
-.box {
+
+h2{
+    color:#333;
+}
+
+.box{
     background:white;
-    border-radius:15px;
     padding:15px;
+    border-radius:12px;
     margin-bottom:15px;
 }
-h2 {
-    color:#4285f4;
-}
-.ok {
-    color:green;
-}
-.no {
-    color:red;
-}
-pre {
-    white-space:pre-wrap;
-}
-button {
-    padding:12px;
-    border:0;
+
+pre{
+    background:#111;
+    color:#00ff00;
+    padding:15px;
     border-radius:10px;
-    background:#4da3ff;
+    white-space:pre-wrap;
+    word-break:break-all;
+}
+
+button{
+    padding:10px 20px;
+    border:0;
+    border-radius:8px;
+    background:#2196f3;
     color:white;
+    font-size:16px;
 }
 </style>
+
 </head>
 
 <body>
 
-<h2>🚗 Android WebView 权限检测</h2>
+<h2>Android WebView Bridge检测</h2>
+
 
 <div class="box">
-<h3>系统信息</h3>
-<pre id="info"></pre>
+
+<h3>状态</h3>
+
+<div id="status">
+检测中...
+</div>
+
 </div>
 
 
 <div class="box">
-<h3>JS接口检测</h3>
-<pre id="bridge"></pre>
+
+<button onclick="checkBridge()">
+开始检测
+</button>
+
 </div>
 
 
 <div class="box">
-<h3>能力测试</h3>
-<button onclick="test()">开始检测</button>
-<pre id="result"></pre>
+
+<h3>Object.keys(window.bridge)</h3>
+
+<pre id="keys">
+暂无
+</pre>
+
 </div>
+
+
+<div class="box">
+
+<h3>完整对象信息</h3>
+
+<pre id="all">
+暂无
+</pre>
+
+</div>
+
 
 
 <script>
 
-let info = "";
+function checkBridge(){
 
-info += "UserAgent:\n";
-info += navigator.userAgent+"\n\n";
+    let status =
+    document.getElementById("status");
 
-info += "语言:\n";
-info += navigator.language+"\n\n";
+    let keys =
+    document.getElementById("keys");
 
-info += "平台:\n";
-info += navigator.platform+"\n\n";
-
-info += "屏幕:\n";
-info += screen.width+" x "+screen.height+"\n\n";
-
-info += "Cookie:\n";
-info += navigator.cookieEnabled;
+    let all =
+    document.getElementById("all");
 
 
-document.getElementById("info").innerText=info;
+    try{
 
 
+        if(typeof window.bridge === "undefined"){
 
-let b="";
+            status.innerHTML =
+            "❌ window.bridge 不存在";
 
-let objects=[
-"xiaomi",
-"miui",
-"car",
-"vehicle",
-"android",
-"webkit",
-"JSBridge",
-"bridge"
-];
+            return;
+        }
 
 
-objects.forEach(function(o){
-
-if(window[o]){
- b+="[存在] "+o+"\n";
-}else{
- b+="[不存在] "+o+"\n";
-}
-
-});
+        status.innerHTML =
+        "✅ window.bridge 存在";
 
 
-document.getElementById("bridge").innerText=b;
+        // 对应：
+        // Object.keys(window.bridge)
+
+        let list =
+        Object.keys(window.bridge);
+
+
+        keys.innerText =
+        JSON.stringify(list,null,2);
 
 
 
-function test(){
+        // 尝试查看完整对象
 
-let r="";
+        let result = {};
 
+        list.forEach(function(item){
 
-// WebView版本
-r+="WebView:\n";
-r+=navigator.userAgent.match(/Chrome\/[\d.]+/)+"\n\n";
+            try{
 
+                result[item] =
+                typeof window.bridge[item];
 
-// 文件协议
-r+="file协议:\n";
+            }catch(e){
 
-if(location.protocol=="file:")
-{
-r+="支持 file://\n";
-}
-else{
-r+="当前:"+location.protocol+"\n";
-}
+                result[item]="error";
+
+            }
+
+        });
 
 
-// 存储
-r+="\nLocalStorage:\n";
-
-try{
-localStorage.setItem("test","ok");
-r+="可用\n";
-}catch(e){
-r+="不可用\n";
-}
+        all.innerText =
+        JSON.stringify(result,null,2);
 
 
-// 下载能力
-r+="\n下载API:\n";
 
-if(window.Blob){
-r+="支持\n";
-}else{
-r+="不支持\n";
-}
+    }catch(e){
 
+        status.innerHTML =
+        "错误："+e;
 
-// Android对象扫描
-
-r+="\n全局对象扫描:\n";
-
-for(let k in window){
-
-if(
-k.toLowerCase().includes("mi")||
-k.toLowerCase().includes("car")||
-k.toLowerCase().includes("android")
-)
-{
-r+=k+"\n";
-}
+    }
 
 }
 
 
-document.getElementById("result").innerText=r;
+// 自动运行
+
+window.onload=function(){
+
+    checkBridge();
 
 }
-
 
 </script>
+
 
 </body>
 </html>
