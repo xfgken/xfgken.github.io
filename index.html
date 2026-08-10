@@ -1,183 +1,47 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8">
-<title>Bridge检测</title>
-
-<style>
-body{
-    font-family: Arial,"Microsoft YaHei";
-    padding:20px;
-    background:#f5f5f5;
-}
-
-h2{
-    color:#333;
-}
-
-.box{
-    background:white;
-    padding:15px;
-    border-radius:12px;
-    margin-bottom:15px;
-}
-
-pre{
-    background:#111;
-    color:#00ff00;
-    padding:15px;
-    border-radius:10px;
-    white-space:pre-wrap;
-    word-break:break-all;
-}
-
-button{
-    padding:10px 20px;
-    border:0;
-    border-radius:8px;
-    background:#2196f3;
-    color:white;
-    font-size:16px;
-}
-</style>
-
-</head>
-
 <body>
 
-<h2>Android WebView Bridge检测</h2>
+<h2>JS对象检测</h2>
 
-
-<div class="box">
-
-<h3>状态</h3>
-
-<div id="status">
-检测中...
-</div>
-
-</div>
-
-
-<div class="box">
-
-<button onclick="checkBridge()">
-开始检测
-</button>
-
-</div>
-
-
-<div class="box">
-
-<h3>Object.keys(window.bridge)</h3>
-
-<pre id="keys">
-暂无
-</pre>
-
-</div>
-
-
-<div class="box">
-
-<h3>完整对象信息</h3>
-
-<pre id="all">
-暂无
-</pre>
-
-</div>
-
+<pre id="out"></pre>
 
 
 <script>
 
-function checkBridge(){
+let arr = [];
 
-    let status =
-    document.getElementById("status");
+[
+"bridge",
+"JSBridge",
+"webkit",
+"xiaomi",
+"miui",
+"car",
+"vehicle",
+"android"
+].forEach(function(name){
 
-    let keys =
-    document.getElementById("keys");
-
-    let all =
-    document.getElementById("all");
-
+    let a;
 
     try{
-
-
-        if(typeof window.bridge === "undefined"){
-
-            status.innerHTML =
-            "❌ window.bridge 不存在";
-
-            return;
-        }
-
-
-        status.innerHTML =
-        "✅ window.bridge 存在";
-
-
-        // 对应：
-        // Object.keys(window.bridge)
-
-        let list =
-        Object.keys(window.bridge);
-
-
-        keys.innerText =
-        JSON.stringify(list,null,2);
-
-
-
-        // 尝试查看完整对象
-
-        let result = {};
-
-        list.forEach(function(item){
-
-            try{
-
-                result[item] =
-                typeof window.bridge[item];
-
-            }catch(e){
-
-                result[item]="error";
-
-            }
-
-        });
-
-
-        all.innerText =
-        JSON.stringify(result,null,2);
-
-
-
+        a = typeof window[name];
     }catch(e){
-
-        status.innerHTML =
-        "错误："+e;
-
+        a="error";
     }
 
-}
+    arr.push(
+        name + " : " + a
+    );
+
+});
 
 
-// 自动运行
+document.getElementById("out").innerText =
+arr.join("\n");
 
-window.onload=function(){
-
-    checkBridge();
-
-}
 
 </script>
-
 
 </body>
 </html>
