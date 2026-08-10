@@ -2,215 +2,228 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Android WebView 检测工具</title>
+<meta name="viewport" content="width=device-width">
+<title>WebView Bridge Detector</title>
 
 <style>
 body{
-    font-family: monospace;
     background:#111;
-    color:#00ff88;
-    padding:20px;
+    color:#00ff66;
+    font-family:monospace;
+    padding:16px;
 }
-
 h2{
-    color:#fff;
+    color:white;
 }
-
 .box{
-    border:1px solid #00ff88;
-    padding:15px;
-    margin-bottom:15px;
+    border:1px solid #00ff66;
     border-radius:10px;
+    padding:12px;
+    margin:12px 0;
     white-space:pre-wrap;
+    word-break:break-all;
 }
-
 button{
-    padding:10px;
-    background:#00ff88;
+    width:100%;
+    padding:14px;
     border:0;
-    border-radius:8px;
+    border-radius:10px;
     font-size:16px;
 }
 </style>
-
 </head>
 
 <body>
 
-<h2>Android WebView 检测工具</h2>
+<h2>WebView Bridge Detector</h2>
 
 <button onclick="scan()">开始检测</button>
 
-<div class="box" id="result">
-等待检测...
-</div>
-
+<div id="out"></div>
 
 <script>
 
-function add(title,text){
+function print(title,text){
 
-    let box=document.createElement("div");
-    box.className="box";
-    box.innerHTML="<b>"+title+"</b>\n"+text;
+    let d=document.createElement("div");
 
-    document.body.appendChild(box);
+    d.className="box";
 
+    d.innerText=
+        "===== "+title+" =====\n\n"+
+        text;
+
+    document.getElementById("out").appendChild(d);
+}
+
+
+function inspect(name,obj){
+
+    let result="";
+
+    if(obj === undefined){
+        return name+" : undefined";
+    }
+
+    if(obj === null){
+        return name+" : null";
+    }
+
+    result += "类型: "+typeof obj+"\n\n";
+
+    try{
+
+        let keys=Object.getOwnPropertyNames(obj);
+
+        result+="自身属性:\n";
+
+        keys.forEach(function(k){
+
+            try{
+
+                result+=
+                    "  "+k+
+                    " ["+typeof obj[k]+"]\n";
+
+            }catch(e){
+
+                result+=
+                    "  "+k+
+                    " [无法读取]\n";
+            }
+
+        });
+
+    }catch(e){
+
+        result+="读取自身属性失败\n";
+    }
+
+
+    try{
+
+        let proto=Object.getPrototypeOf(obj);
+
+        if(proto){
+
+            let keys=
+                Object.getOwnPropertyNames(proto);
+
+            result+="\n原型属性:\n";
+
+            keys.forEach(function(k){
+
+                try{
+
+                    result+=
+                        "  "+k+
+                        " ["+typeof proto[k]+"]\n";
+
+                }catch(e){
+
+                    result+=
+                        "  "+k+
+                        " [无法读取]\n";
+                }
+
+            });
+
+        }
+
+    }catch(e){
+
+        result+="读取原型失败\n";
+    }
+
+
+    return result;
 }
 
 
 function scan(){
 
-document.getElementById("result").innerHTML="检测中...";
+    document.getElementById("out").innerHTML="";
 
 
-let r="";
+    print(
+        "UserAgent",
+        navigator.userAgent
+    );
 
 
-// 基础信息
-
-r+="UserAgent:\n";
-r+=navigator.userAgent+"\n\n";
-
-
-r+="平台:\n";
-r+=navigator.platform+"\n\n";
-
+    print(
+        "android",
+        inspect(
+            "android",
+            window.android
+        )
+    );
 
 
-// 常见对象
-
-let objs=[
-
-"bridge",
-"JSBridge",
-"webkit",
-"xiaomi",
-"miui",
-"car",
-"vehicle",
-"android",
-"native",
-"app"
-
-];
+    print(
+        "ToutiaoJSBridge",
+        inspect(
+            "ToutiaoJSBridge",
+            window.ToutiaoJSBridge
+        )
+    );
 
 
-r+="=== JS对象检测 ===\n";
+    print(
+        "byted_mixrender_native",
+        inspect(
+            "byted_mixrender_native",
+            window.byted_mixrender_native
+        )
+    );
 
 
-objs.forEach(function(o){
+    print(
+        "lesJSBridgeTransferMonitor",
+        inspect(
+            "lesJSBridgeTransferMonitor",
+            window.lesJSBridgeTransferMonitor
+        )
+    );
 
-    try{
 
-        if(window[o]!==undefined){
+    print(
+        "jsIELiveTimingMonitor",
+        inspect(
+            "jsIELiveTimingMonitor",
+            window.jsIELiveTimingMonitor
+        )
+    );
 
-            r+=o+" : "+typeof window[o]+"\n";
 
-        }else{
+    let result="";
 
-            r+=o+" : undefined\n";
 
+    for(let key in window){
+
+        if(
+            /bridge|native|xiaomi|miui|car|vehicle|android|toutiao|byted/i
+            .test(key)
+        ){
+
+            result +=
+                key+
+                " ["+
+                typeof window[key]+
+                "]\n";
         }
 
-
-    }catch(e){
-
-        r+=o+" : error\n";
-
-    }
-
-});
-
-
-
-
-// Android接口
-
-r+="\n=== Android接口 ===\n";
-
-
-if(window.android){
-
-    r+="android存在\n\n";
-
-
-    try{
-
-        let keys=Object.getOwnPropertyNames(
-            Object.getPrototypeOf(window.android)
-        );
-
-
-        keys.forEach(k=>{
-
-            r+=k+"\n";
-
-        });
-
-
-    }catch(e){
-
-        r+="无法读取接口\n";
-
     }
 
 
-}else{
-
-    r+="没有 android 对象\n";
-
-}
-
-
-
-// window对象搜索
-
-r+="\n=== window可疑对象 ===\n";
-
-
-for(let k in window){
-
-    if(
-        k.toLowerCase()
-        .match(/android|car|mi|xiaomi|bridge|native/)
-    ){
-
-        r+=k+"\n";
-
-    }
-
-}
-
-
-
-// WebView判断
-
-r+="\n=== WebView判断 ===\n";
-
-
-if(
-navigator.userAgent.includes("wv")
-){
-
-r+="Android WebView\n";
-
-}else{
-
-r+="普通浏览器或隐藏UA\n";
-
-}
-
-
-
-document.getElementById("result").innerText=r;
-
-
+    print(
+        "Window相关对象",
+        result
+    );
 
 }
 
 </script>
-
 
 </body>
 </html>
