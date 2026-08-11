@@ -133,7 +133,7 @@ body{
   font-family:'JetBrains Mono','Consolas','Courier New',monospace;
   font-size:14px;line-height:1.55;letter-spacing:.3px;
   color:#D0BCFF;
-  min-height:108px;
+  min-height:132px;
   overflow:hidden;
 }
 .terminal-body pre{
@@ -147,22 +147,6 @@ body{
   animation:blink 0.9s step-end infinite;
 }
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-
-/* ===== 三个标签：横排均匀分布 · 占满整行 ===== */
-.chips{
-  display:flex;gap:8px;margin-top:12px;
-}
-.chip{
-  flex:1;
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  height:44px;border-radius:16px;
-  border:1px solid var(--outline-variant);
-  background:var(--surface-container-low);
-  color:var(--on-surface);
-  font-size:15px;font-weight:700;
-  transition:background-color .9s ease,color .9s ease,border-color .9s ease;
-}
-.chip .material-symbols-outlined{font-size:20px;color:var(--primary);transition:color .9s ease;}
 
 /* ===== 卡片（圆角矩形 · 同色系浅深） ===== */
 .card{
@@ -317,13 +301,6 @@ footer .copy{margin-top:8px;}
       <pre id="termOut"></pre><span class="t-cursor">_</span>
     </div>
   </section>
-
-  <!-- 三个标签：均匀分布 · 占满整行 -->
-  <div class="chips">
-    <span class="chip"><span class="material-symbols-outlined">style</span>简约</span>
-    <span class="chip"><span class="material-symbols-outlined">lightbulb</span>思考</span>
-    <span class="chip"><span class="material-symbols-outlined">edit_note</span>记录</span>
-  </div>
 
   <!-- 项目 -->
   <section class="card proj">
@@ -524,6 +501,8 @@ const termOut=document.getElementById('termOut');
 const typeLines=[
   "$ whoami",
   "xfgken",
+  "$ ls",
+  "简约    思考    记录",
   "$ cat creed.txt",
   "永远相信美好的事情即将发生"
 ];
