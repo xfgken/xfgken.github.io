@@ -80,10 +80,10 @@ body{
 .appbar .title{font-size:31px;font-weight:800;letter-spacing:.3px;color:var(--primary);transition:color .9s ease;}
 .appbar-actions{display:flex;gap:8px;}
 
-/* ===== MD3 圆形图标按钮（无阴影） ===== */
+/* ===== MD3 圆形图标按钮（无阴影 · 缩小版） ===== */
 .icon-btn{
   position:relative;overflow:hidden;
-  width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;
+  width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;
   background:transparent;color:var(--on-surface);
   display:inline-flex;align-items:center;justify-content:center;
   transition:background-color .2s,color .9s ease,transform .1s;
@@ -92,9 +92,9 @@ body{
 .icon-btn:active{transform:scale(.88);}
 
 /* 主题图标：太阳/月亮 旋转+交叉淡入 */
-.theme-ico{position:relative;width:24px;height:24px;display:block;transition:transform .6s cubic-bezier(.2,0,0,1);}
+.theme-ico{position:relative;width:17px;height:17px;display:block;transition:transform .6s cubic-bezier(.2,0,0,1);}
 .theme-ico.spin{transform:rotate(360deg);}
-.theme-ico .ms{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .5s cubic-bezier(.2,0,0,1),opacity .3s;}
+.theme-ico .ms{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;transition:transform .5s cubic-bezier(.2,0,0,1),opacity .3s;}
 .theme-ico .sun{opacity:1;transform:rotate(0deg) scale(1);}
 .theme-ico .moon{opacity:0;transform:rotate(-90deg) scale(.2);}
 [data-theme="dark"] .theme-ico .sun{opacity:0;transform:rotate(90deg) scale(.2);}
@@ -149,16 +149,21 @@ body{
   min-inline-size:0;
   transition:background-color .9s ease,border-color .9s ease,color .9s ease;
 }
-/* 标题嵌在卡片顶部边框线左侧（原生 legend · 文字下方主题色横线） */
+/* 标题嵌在卡片顶部边框线左侧（原生 legend · 文字下方主题色横线 · 线宽=文字宽） */
 .card legend{
   margin:0;
-  padding:0 10px 2px;
+  padding:0;
   color:var(--on-surface-variant);
   font-size:13px;font-weight:700;letter-spacing:3px;
   white-space:nowrap;text-align:left;
   background:transparent;
+  transition:color .9s ease;
+}
+.card legend span{
+  display:inline-block;
   border-bottom:2px solid var(--primary);
-  transition:color .9s ease,border-color .9s ease;
+  padding-bottom:2px;
+  transition:border-color .9s ease;
 }
 .card-ico{
   width:44px;height:44px;border-radius:14px;flex-shrink:0;
@@ -199,10 +204,10 @@ footer{
   transition:color .9s ease;
 }
 
-/* ===== 换色按钮图标（点击旋转 + 随机换色） ===== */
-.palette-ico{position:relative;width:24px;height:24px;display:block;transition:transform .6s cubic-bezier(.2,0,0,1);}
+/* ===== 换色按钮图标（点击旋转 + 随机换色 · 缩小版） ===== */
+.palette-ico{position:relative;width:17px;height:17px;display:block;transition:transform .6s cubic-bezier(.2,0,0,1);}
 .palette-ico.spin{transform:rotate(360deg);}
-.palette-ico .ms{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .4s cubic-bezier(.2,0,0,1),opacity .25s;}
+.palette-ico .ms{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;transition:transform .4s cubic-bezier(.2,0,0,1),opacity .25s;}
 
 /* ===== Ripple ===== */
 .ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.12;transform:scale(0);animation:ripple .5s ease-out forwards;pointer-events:none;}
@@ -254,7 +259,7 @@ footer{
 
   <!-- 项目 -->
   <fieldset class="card proj">
-    <legend>我的项目</legend>
+    <legend><span>我的项目</span></legend>
     <div class="phead">
       <div class="card-ico"><span class="material-symbols-outlined">package_2</span></div>
       <div>
@@ -271,7 +276,7 @@ footer{
 
   <!-- 联系我 -->
   <fieldset class="card contact">
-    <legend>联系我</legend>
+    <legend><span>联系我</span></legend>
     <div class="cbody">
       <div class="card-ico"><span class="material-symbols-outlined">mail</span></div>
       <a class="t" href="mailto:xfgken@gmail.com">欢迎交流，可通过邮箱联系<b>xfgken@gmail.com</b></a>
@@ -422,7 +427,7 @@ let pi=0,ci=0;
     ci=0;pi++;
     if(pi>=creedParts.length)return; /* 全部打完，光标停在最后继续闪烁 */
   }
-  setTimeout(type,185);
+  setTimeout(type,220);
 })();
 </script>
 </body>
