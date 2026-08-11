@@ -100,26 +100,16 @@ body{
 [data-theme="dark"] .theme-ico .sun{opacity:0;transform:rotate(90deg) scale(.2);}
 [data-theme="dark"] .theme-ico .moon{opacity:1;transform:rotate(0deg) scale(1);}
 
-.app{max-width:640px;width:100%;margin:0 auto;padding:8px 16px 12px;flex:1;}
+.app{max-width:640px;width:100%;margin:0 auto;padding:18px 16px 8px;flex:1;}
 
-/* ===== 信条卡片（primary-container · 打字机） ===== */
-.creed-card{
-  display:flex;align-items:center;gap:16px;
-  background:var(--primary-container);
-  border-radius:24px;padding:22px 20px;
-  transition:background-color .9s ease;
-}
-.creed-card .q{
-  width:48px;height:48px;border-radius:16px;flex-shrink:0;
-  background:var(--primary);color:var(--on-primary);
-  display:flex;align-items:center;justify-content:center;
-  transition:background-color .9s ease,color .9s ease;
-}
-.creed-card .q .material-symbols-outlined{font-size:24px;}
+/* ===== 我的信条（无卡片 · 打字机 · 对齐 简约+思考 宽度） ===== */
 .creed-text{
-  font-size:18px;font-weight:600;letter-spacing:.5px;line-height:1.6;
-  color:var(--on-primary-container);
-  min-height:29px;
+  font-size:16px;font-weight:700;letter-spacing:.2px;line-height:1.6;
+  color:var(--on-surface);
+  min-height:26px;
+  width:calc((100% - 24px) / 3 * 2 + 12px);
+  margin-bottom:14px;
+  white-space:nowrap;
   transition:color .9s ease;
 }
 .cursor{
@@ -130,7 +120,7 @@ body{
 
 /* ===== 三个标签：横排均匀分布 · 占满整行 ===== */
 .tag-row{
-  display:flex;gap:12px;margin-top:16px;
+  display:flex;gap:12px;
 }
 .tag{
   flex:1;
@@ -185,7 +175,7 @@ body{
 /* ===== Footer ===== */
 footer{
   text-align:center;font-size:14px;font-weight:600;color:var(--on-surface-variant);
-  margin-top:16px;padding:12px 0 6px;
+  margin-top:20px;padding:12px 0 8px;
   letter-spacing:1px;
   transition:color .9s ease;
 }
@@ -263,11 +253,8 @@ footer{
 </header>
 
 <main class="app">
-  <!-- 我的信条：打字机效果 -->
-  <section class="creed-card">
-    <div class="q"><span class="material-symbols-outlined">format_quote</span></div>
-    <p class="creed-text"><span id="typed"></span><span class="cursor">_</span></p>
-  </section>
+  <!-- 我的信条：打字机效果（对齐 简约+思考 宽度） -->
+  <p class="creed-text"><span id="typed"></span><span class="cursor">_</span></p>
 
   <!-- 三个标签 -->
   <div class="tag-row">
