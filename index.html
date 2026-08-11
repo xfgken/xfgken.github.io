@@ -77,7 +77,7 @@ body{
   background:var(--surface);
   transition:background-color .9s ease;
 }
-.appbar .title{font-size:24px;font-weight:800;letter-spacing:.3px;}
+.appbar .title{font-size:24px;font-weight:800;letter-spacing:.3px;color:var(--primary);transition:color .9s ease;}
 .appbar-actions{display:flex;gap:8px;}
 
 /* ===== MD3 圆形图标按钮（无阴影） ===== */
@@ -102,12 +102,12 @@ body{
 
 .app{max-width:640px;width:100%;margin:0 auto;padding:18px 16px 8px;flex:1;}
 
-/* ===== 我的信条（打字机 · 放大 · 居中 · 紧凑行距） ===== */
+/* ===== 我的信条（打字机 · 放大 · 居中 · 正常行距） ===== */
 .creed-text{
   font-size:clamp(26px,7.5vw,34px);
-  font-weight:700;letter-spacing:.5px;line-height:1.25;
+  font-weight:700;letter-spacing:.5px;line-height:1.15;
   color:var(--on-surface);
-  min-height:70px;
+  min-height:60px;
   width:100%;
   margin-bottom:14px;
   text-align:center;
@@ -199,7 +199,7 @@ footer{
   transition:color .9s ease;
 }
 
-/* ===== 换色按钮图标（palette ↔ refresh 交替） ===== */
+/* ===== 换色按钮图标（点击旋转 + 随机换色） ===== */
 .palette-ico{position:relative;width:24px;height:24px;display:block;transition:transform .6s cubic-bezier(.2,0,0,1);}
 .palette-ico.spin{transform:rotate(360deg);}
 .palette-ico .ms{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .4s cubic-bezier(.2,0,0,1),opacity .25s;}
@@ -241,7 +241,7 @@ footer{
 <main class="app">
   <!-- 我的信条：打字机效果（4 段分区着色 · 两行） -->
   <p class="creed-text">
-    <span class="c1" id="t1"></span> <span class="c2" id="t2"></span> <span class="c3" id="t3"></span><br>
+    <span class="c1" id="t1"></span><span class="c2" id="t2"></span><span class="c3" id="t3"></span><br>
     <span class="c4" id="t4"></span><span class="cursor">_</span>
   </p>
 
@@ -361,27 +361,15 @@ themeBtn.addEventListener('click',()=>{
   setTimeout(()=>themeIco.classList.remove('spin'),650);
 });
 
-/* 换色按钮：palette 图标 → 0.5s 后变 refresh 并随机换色；refresh 旋转换色后回 palette */
+/* 换色按钮：点击一次，图标旋转 360° + 随机换色 */
 const paletteBtn=document.getElementById('paletteBtn');
 const paletteIco=document.getElementById('paletteIco');
-const paletteMs=paletteIco.querySelector('.ms');
-let iconMode='palette';
 paletteBtn.addEventListener('click',()=>{
-  if(iconMode==='palette'){
-    setTimeout(()=>{
-      paletteMs.textContent='refresh';
-      iconMode='refresh';
-      randomizeColor();
-    },500);
-  }else{
-    paletteIco.classList.remove('spin');
-    void paletteIco.offsetWidth;
-    paletteIco.classList.add('spin');
-    randomizeColor();
-    paletteMs.textContent='palette';
-    iconMode='palette';
-    setTimeout(()=>paletteIco.classList.remove('spin'),650);
-  }
+  paletteIco.classList.remove('spin');
+  void paletteIco.offsetWidth;
+  paletteIco.classList.add('spin');
+  randomizeColor();
+  setTimeout(()=>paletteIco.classList.remove('spin'),650);
 });
 
 /* MD3 Ripple */
