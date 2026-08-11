@@ -18,6 +18,9 @@
   --surface-container-high:#ECE6F0;
   --on-surface-variant:#49454F;
   --outline-variant:#CAC4D0;
+  --dot-a:#EADDFF;
+  --dot-b:#B39DDB;
+  --dot-c:#7E57C2;
 }
 [data-theme="dark"]{
   --primary:#D0BCFF;
@@ -30,6 +33,9 @@
   --surface-container-high:#2B2930;
   --on-surface-variant:#CAC4D0;
   --outline-variant:#49454F;
+  --dot-a:#E6E0E9;
+  --dot-b:#C4B2EB;
+  --dot-c:#9A82DB;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{height:100%;}
@@ -58,7 +64,7 @@ body{
   background:var(--surface);
   transition:background-color .9s ease;
 }
-.appbar .title{font-size:20px;font-weight:800;letter-spacing:.3px;}
+.appbar .title{font-size:24px;font-weight:800;letter-spacing:.3px;}
 .appbar-actions{display:flex;gap:8px;}
 
 /* ===== MD3 圆形图标按钮（无阴影） ===== */
@@ -81,7 +87,7 @@ body{
 [data-theme="dark"] .theme-ico .sun{opacity:0;transform:rotate(90deg) scale(.2);}
 [data-theme="dark"] .theme-ico .moon{opacity:1;transform:rotate(0deg) scale(1);}
 
-.app{max-width:640px;margin:0 auto;padding:8px 16px 32px;}
+.app{max-width:640px;margin:0 auto;padding:8px 16px 12px;}
 
 /* ===== 信条终端框（圆角矩形 · 深色标题栏 + 浅色终端体） ===== */
 .terminal{
@@ -97,18 +103,18 @@ body{
   color:var(--on-primary);
   transition:background-color .9s ease,color .9s ease;
 }
-.terminal-bar .t-title{font-size:13px;font-weight:700;letter-spacing:1px;opacity:.9;}
+.terminal-bar .t-title{font-size:13px;font-weight:700;letter-spacing:1px;opacity:.9;line-height:14px;}
 .terminal-bar .dots{display:flex;align-items:center;gap:6px;}
-.terminal-bar .dot{width:11px;height:11px;border-radius:50%;}
-.terminal-bar .dot.close{background:#B3261E;}
-.terminal-bar .dot.max{background:#006C4C;}
-.terminal-bar .dot.min{background:#7A5900;}
+.terminal-bar .dot{width:14px;height:14px;border-radius:50%;}
+.terminal-bar .dot.close{background:var(--dot-a);}
+.terminal-bar .dot.max{background:var(--dot-b);}
+.terminal-bar .dot.min{background:var(--dot-c);}
 .terminal-body{
-  padding:22px 18px;
+  padding:18px 16px;
   font-family:'Baloo 2','JetBrains Mono','Consolas','Courier New',monospace;
   font-size:17px;font-weight:600;letter-spacing:.5px;
   color:var(--on-primary-container);
-  min-height:76px;
+  min-height:66px;
   transition:color .9s ease;
 }
 .terminal-body .prompt{font-weight:800;margin-right:8px;}
@@ -121,7 +127,7 @@ body{
 
 /* ===== 三个标签：横排均匀分布 · 占满整行 ===== */
 .chips{
-  display:flex;gap:8px;margin-top:16px;
+  display:flex;gap:8px;margin-top:12px;
 }
 .chip{
   flex:1;
@@ -139,7 +145,7 @@ body{
 .card{
   background:var(--surface-container-low);
   border:1px solid var(--outline-variant);
-  border-radius:24px;padding:22px;margin-top:16px;
+  border-radius:24px;padding:18px;margin-top:12px;
   transition:background-color .9s ease,border-color .9s ease,color .9s ease;
 }
 .card-ico{
@@ -151,10 +157,10 @@ body{
 .card-ico .material-symbols-outlined{font-size:22px;}
 
 /* 项目卡片 */
-.proj .phead{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.proj .phead{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
 .proj .pname{font-size:18px;font-weight:700;}
 .proj .ptag{font-size:12px;font-weight:600;color:var(--on-surface-variant);margin-top:2px;transition:color .9s ease;}
-.proj p{font-size:14px;color:var(--on-surface-variant);line-height:1.8;margin-bottom:18px;transition:color .9s ease;}
+.proj p{font-size:14px;color:var(--on-surface-variant);line-height:1.7;margin-bottom:14px;transition:color .9s ease;}
 
 /* MD3 Filled Button（无阴影） */
 .btn{
@@ -176,7 +182,7 @@ body{
 /* ===== Footer ===== */
 footer{
   text-align:center;font-size:14px;font-weight:600;color:var(--on-surface-variant);
-  margin-top:32px;padding:18px 0 8px;
+  margin-top:16px;padding:12px 0 0;
   border-top:1px solid var(--outline-variant);
   letter-spacing:1px;
   transition:color .9s ease,border-color .9s ease;
@@ -238,9 +244,6 @@ footer{
     <h3>调色板</h3>
     <p class="hint">点击颜色 · 缓慢过渡 · 每次随机 5 种配色</p>
     <div class="swatches" id="swatches"></div>
-    <div class="actions">
-      <button class="text-btn" id="closeDialog">完成</button>
-    </div>
   </div>
 </div>
 
@@ -441,7 +444,6 @@ function closePanel(){
 paletteBtn.addEventListener('click',()=>{
   if(panel.classList.contains('open')){closePanel();}else{openPanel();}
 });
-document.getElementById('closeDialog').addEventListener('click',closePanel);
 document.addEventListener('click',e=>{
   if(panel.classList.contains('open')&&!panel.contains(e.target)&&!paletteBtn.contains(e.target)){
     closePanel();
