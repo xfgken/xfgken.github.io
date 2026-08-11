@@ -39,6 +39,23 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{height:100%;}
+
+/* ===== 页面加载动画（莫奈浅色背景 + 深色小转圈） ===== */
+#loading{
+  position:fixed;inset:0;z-index:99;
+  background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  opacity:1;visibility:visible;
+  transition:opacity .6s ease,visibility .6s ease;
+}
+#loading.hide{opacity:0;visibility:hidden;pointer-events:none;}
+.spinner{
+  width:38px;height:38px;border-radius:50%;
+  border:4px solid var(--primary-container);
+  border-top-color:var(--primary);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
 body{
   font-family:'Baloo 2','MiSans','HarmonyOS Sans SC','HarmonyOS Sans','MiUI','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
   background:var(--surface);
@@ -116,7 +133,7 @@ body{
   font-family:'JetBrains Mono','Consolas','Courier New',monospace;
   font-size:14px;line-height:1.9;letter-spacing:.3px;
   color:#D0BCFF;
-  min-height:230px;
+  min-height:150px;
   overflow:hidden;
 }
 .terminal-body pre{
@@ -250,6 +267,11 @@ footer{
 </head>
 <body>
 
+<!-- 加载动画遮罩 -->
+<div id="loading">
+  <div class="spinner"></div>
+</div>
+
 <!-- 调色板面板：从右上角按钮整体放大 -->
 <div class="palette-panel" id="palettePanel">
   <div class="inner">
@@ -279,7 +301,7 @@ footer{
   <!-- 我的信条：终端打字效果 -->
   <section class="terminal">
     <div class="terminal-bar">
-      <span class="t-title">我的信条</span>
+      <span class="t-title">Super Terminal</span>
       <div class="dots">
         <span class="dot close" title="擦掉"></span>
         <span class="dot max" title="放大"></span>
@@ -495,15 +517,11 @@ document.addEventListener('click',e=>{
   buildSwatches();
 })();
 
-/* 终端打字机效果：多行命令输出（基本信息 → 我的信条） */
+/* 终端打字机效果：精简输出 */
 const termOut=document.getElementById('termOut');
 const typeLines=[
   "$ whoami",
   "xfgken",
-  "$ uname -m",
-  (navigator.platform||"Android")+" · WebView",
-  "$ date",
-  new Date().toLocaleString(),
   "$ cat creed.txt",
   "永远相信美好的事情即将发生"
 ];
@@ -513,8 +531,19 @@ let ti=0;
   if(ti<=fullText.length){
     termOut.textContent=fullText.slice(0,ti);
     ti++;
-    setTimeout(type,40);
+    setTimeout(type,45);
   }
+})();
+
+/* 页面加载完成后隐藏加载动画（含兜底） */
+(function hideLoading(){
+  const hide=()=>{const l=document.getElementById('loading');if(l)l.classList.add('hide');};
+  if(document.readyState==='complete'){
+    setTimeout(hide,500);
+  }else{
+    window.addEventListener('load',()=>setTimeout(hide,500));
+  }
+  setTimeout(hide,2500); /* 兜底：最多2.5秒 */
 })();
 
 /* 真实获取当前 IP + 国家国旗 */
