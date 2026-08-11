@@ -145,13 +145,13 @@ body{
   min-inline-size:0;
   transition:background-color .9s ease,border-color .9s ease,color .9s ease;
 }
-/* 标题嵌在卡片顶部边框线中间（原生 legend · 透明背景 · 上下居中） */
+/* 标题嵌在卡片顶部边框线左侧（原生 legend · 透明背景） */
 .card legend{
-  margin:0 auto;
-  padding:0 12px;
+  margin:0;
+  padding:0 10px;
   color:var(--on-surface-variant);
   font-size:13px;font-weight:700;letter-spacing:3px;
-  white-space:nowrap;text-align:center;
+  white-space:nowrap;text-align:left;
   background:transparent;
   transition:color .9s ease;
 }
@@ -194,30 +194,20 @@ footer{
   transition:color .9s ease;
 }
 
-/* ===== 调色板面板：居中弹出（圆形→方形，圆角连续过渡） ===== */
+/* ===== 调色板：内嵌主页面（信条上方 · 无框无背景 · 只有色点） ===== */
 .palette-panel{
-  position:fixed;left:50%;top:50%;z-index:21;
-  width:min(380px,calc(100vw - 32px));
-  padding:24px;
-  background:var(--surface-container-high);
-  color:var(--on-surface);
-  border-radius:50%;
-  transform:translate(-50%,-50%) scale(.6);
-  opacity:0;pointer-events:none;
-  transition:transform .45s cubic-bezier(.2,0,0,1),border-radius .45s cubic-bezier(.2,0,0,1),opacity .25s,background-color .9s ease;
+  max-height:0;opacity:0;overflow:hidden;
+  margin-bottom:0;
+  transition:max-height .35s cubic-bezier(.2,0,0,1),opacity .3s,margin-bottom .35s;
 }
 .palette-panel.open{
-  transform:translate(-50%,-50%) scale(1);
-  border-radius:24px;
-  opacity:1;pointer-events:auto;
+  max-height:70px;opacity:1;
+  margin-bottom:14px;
 }
-.palette-panel .inner{opacity:0;transition:opacity .3s .18s;}
-.palette-panel.open .inner{opacity:1;}
-.palette-panel h3{font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:.3px;}
-.palette-panel .hint{font-size:12px;color:var(--on-surface-variant);margin-bottom:18px;transition:color .9s ease;}
-.swatches{display:flex;flex-wrap:wrap;gap:16px;}
+.swatches{display:flex;justify-content:center;gap:14px;}
 .sw{
-  width:46px;height:46px;border-radius:50%;border:2px solid var(--outline-variant);
+  width:42px;height:42px;border-radius:50%;
+  border:2px solid var(--outline-variant);
   cursor:pointer;position:relative;
   transition:transform .2s cubic-bezier(.2,0,0,1),border-color .2s;
 }
@@ -240,15 +230,6 @@ footer{
   <div class="spinner"></div>
 </div>
 
-<!-- 调色板面板：居中弹出 -->
-<div class="palette-panel" id="palettePanel">
-  <div class="inner">
-    <h3>调色板</h3>
-    <p class="hint">点击颜色 · 缓慢过渡 · 每次进入随机配色</p>
-    <div class="swatches" id="swatches"></div>
-  </div>
-</div>
-
 <!-- Top App Bar -->
 <header class="appbar">
   <span class="title">xfgken</span>
@@ -266,6 +247,11 @@ footer{
 </header>
 
 <main class="app">
+  <!-- 调色板：内嵌信条上方，点击调色板按钮展开/收起 -->
+  <div class="palette-panel" id="palettePanel">
+    <div class="swatches" id="swatches"></div>
+  </div>
+
   <!-- 我的信条：打字机效果（对齐 简约+思考 宽度） -->
   <p class="creed-text"><span id="typed"></span><span class="cursor">_</span></p>
 
@@ -373,9 +359,10 @@ function buildSwatches(){
     if(cur&&p.name===cur.name)b.classList.add('active');
     b.onclick=()=>{
       state.mode='manual';state.idx=PALETTES.indexOf(p);
-      applyPalette(p); /* CSS变量变化 → 0.9s 慢速过渡变色，面板保持打开实时预览 */
+      applyPalette(p); /* CSS变量变化 → 0.9s 慢速过渡变色 */
       document.querySelectorAll('.sw').forEach(s=>s.classList.remove('active'));
       b.classList.add('active');
+      closePanel(); /* 点击颜色即缩回 */
     };
     box.appendChild(b);
   });
