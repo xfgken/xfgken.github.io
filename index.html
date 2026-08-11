@@ -44,6 +44,7 @@ body{
   background:var(--surface);
   color:var(--on-surface);
   min-height:100%;
+  display:flex;flex-direction:column;
   transition:background-color .9s ease,color .9s ease;
 }
 
@@ -87,9 +88,9 @@ body{
 [data-theme="dark"] .theme-ico .sun{opacity:0;transform:rotate(90deg) scale(.2);}
 [data-theme="dark"] .theme-ico .moon{opacity:1;transform:rotate(0deg) scale(1);}
 
-.app{max-width:640px;margin:0 auto;padding:8px 16px 12px;}
+.app{max-width:640px;width:100%;margin:0 auto;padding:8px 16px 12px;flex:1;}
 
-/* ===== 信条终端框（圆角矩形 · 深色标题栏 + 浅色终端体） ===== */
+/* ===== 信条终端框（仿真终端 · 深色终端体 + 多行输出） ===== */
 .terminal{
   border-radius:24px;
   overflow:hidden;
@@ -110,12 +111,17 @@ body{
 .terminal-bar .dot.max{background:var(--dot-b);}
 .terminal-bar .dot.min{background:var(--dot-c);}
 .terminal-body{
-  padding:18px 16px;
-  font-family:'Baloo 2','JetBrains Mono','Consolas','Courier New',monospace;
-  font-size:17px;font-weight:600;letter-spacing:.5px;
-  color:var(--on-primary-container);
-  min-height:66px;
-  transition:color .9s ease;
+  padding:16px;
+  background:#16121F;
+  font-family:'JetBrains Mono','Consolas','Courier New',monospace;
+  font-size:14px;line-height:1.9;letter-spacing:.3px;
+  color:#D0BCFF;
+  min-height:230px;
+  overflow:hidden;
+}
+.terminal-body pre{
+  margin:0;padding:0;white-space:pre-wrap;word-break:break-all;
+  font:inherit;color:inherit;
 }
 .terminal-body .prompt{font-weight:800;margin-right:8px;}
 .t-cursor{
@@ -178,6 +184,12 @@ body{
 .contact{display:flex;align-items:center;gap:16px;}
 .contact .t{font-size:13px;color:var(--on-surface-variant);text-decoration:none;transition:color .9s ease;}
 .contact .t b{display:block;font-size:16px;color:var(--on-surface);font-weight:700;margin-top:3px;letter-spacing:.3px;transition:color .9s ease;}
+
+/* IP 卡片 */
+.ip-card{display:flex;align-items:center;gap:16px;}
+.ip-card .ip-flag{font-size:40px;line-height:1;flex-shrink:0;}
+.ip-card .t{font-size:13px;color:var(--on-surface-variant);text-decoration:none;transition:color .9s ease;}
+.ip-card .t b{display:block;font-size:16px;color:var(--on-surface);font-weight:700;margin-top:3px;letter-spacing:.3px;transition:color .9s ease;}
 
 /* ===== Footer ===== */
 footer{
@@ -275,7 +287,7 @@ footer{
       </div>
     </div>
     <div class="terminal-body">
-      <span class="prompt">$</span><span id="typed"></span><span class="t-cursor">_</span>
+      <pre id="termOut"></pre><span class="t-cursor">_</span>
     </div>
   </section>
 
@@ -306,6 +318,12 @@ footer{
   <section class="card contact">
     <div class="card-ico"><span class="material-symbols-outlined">mail</span></div>
     <a class="t" href="mailto:xfgken@gmail.com">欢迎交流，可通过邮箱联系<b>xfgken@gmail.com</b></a>
+  </section>
+
+  <!-- 当前 IP -->
+  <section class="card ip-card">
+    <div class="ip-flag" id="ipFlag">🌐</div>
+    <a class="t" href="https://ipapi.co/" target="_blank" rel="noopener">当前IP地址<b id="ipAddr">获取中...</b></a>
   </section>
 </main>
 
@@ -477,15 +495,47 @@ document.addEventListener('click',e=>{
   buildSwatches();
 })();
 
-/* 终端打字机效果：逐字打出 + _ 下划线光标 */
-const typeText="永远相信美好的事情即将发生";
-const typedEl=document.getElementById('typed');
+/* 终端打字机效果：多行命令输出（基本信息 → 我的信条） */
+const termOut=document.getElementById('termOut');
+const typeLines=[
+  "$ whoami",
+  "xfgken",
+  "$ uname -m",
+  (navigator.platform||"Android")+" · WebView",
+  "$ date",
+  new Date().toLocaleString(),
+  "$ cat creed.txt",
+  "永远相信美好的事情即将发生"
+];
+const fullText=typeLines.join("\n");
 let ti=0;
 (function type(){
-  if(ti<=typeText.length){
-    typedEl.textContent=typeText.slice(0,ti);
+  if(ti<=fullText.length){
+    termOut.textContent=fullText.slice(0,ti);
     ti++;
-    setTimeout(type,130);
+    setTimeout(type,40);
+  }
+})();
+
+/* 真实获取当前 IP + 国家国旗 */
+(async function fetchIP(){
+  const flagEl=document.getElementById('ipFlag');
+  const ipEl=document.getElementById('ipAddr');
+  try{
+    const d=await (await fetch('https://ipapi.co/json/')).json();
+    if(d&&d.ip){
+      ipEl.textContent=d.ip;
+      if(d.country_code){
+        flagEl.textContent=d.country_code.replace(/./g,c=>String.fromCodePoint(127397+c.charCodeAt(0)));
+      }
+      return;
+    }
+  }catch(e){}
+  try{
+    const ip=await (await fetch('https://api.ipify.org')).text();
+    if(ip)ipEl.textContent=ip;
+  }catch(e){
+    ipEl.textContent='获取失败';
   }
 })();
 </script>
