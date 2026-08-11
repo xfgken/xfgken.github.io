@@ -114,6 +114,11 @@ body{
   white-space:pre-line;
   transition:color .9s ease;
 }
+.creed-text span{transition:color .9s ease;}
+.creed-text .c1{color:var(--c1);}
+.creed-text .c2{color:var(--c2);}
+.creed-text .c3{color:var(--c3);}
+.creed-text .c4{color:var(--c4);}
 .cursor{
   display:inline-block;font-weight:800;
   animation:blink .9s step-end infinite;
@@ -194,17 +199,17 @@ footer{
   transition:color .9s ease;
 }
 
-/* ===== 调色板：内嵌主页面（信条上方 · 无框无背景 · 只有色点） ===== */
+/* ===== 调色板：内嵌主页面（信条上方 · 无框无背景 · 原封不动往上推） ===== */
 .palette-panel{
   max-height:0;opacity:0;overflow:hidden;
   margin-bottom:0;
-  transform:scale(.1);transform-origin:center;
-  transition:max-height .35s cubic-bezier(.2,0,0,1),opacity .3s,margin-bottom .35s,transform .3s cubic-bezier(.2,0,0,1);
+  transform:translateY(10px);
+  transition:max-height .3s cubic-bezier(.2,0,0,1),opacity .25s,margin-bottom .3s,transform .3s cubic-bezier(.2,0,0,1);
 }
 .palette-panel.open{
   max-height:70px;opacity:1;
   margin-bottom:14px;
-  transform:scale(1);
+  transform:translateY(0);
 }
 .swatches{display:flex;justify-content:center;gap:14px;}
 .sw{
@@ -264,8 +269,11 @@ footer{
     <div class="swatches" id="swatches"></div>
   </div>
 
-  <!-- 我的信条：打字机效果（对齐 简约+思考 宽度） -->
-  <p class="creed-text"><span id="typed"></span><span class="cursor">_</span></p>
+  <!-- 我的信条：打字机效果（4 段分区着色 · 两行） -->
+  <p class="creed-text">
+    <span class="c1" id="t1"></span> <span class="c2" id="t2"></span> <span class="c3" id="t3"></span><br>
+    <span class="c4" id="t4"></span><span class="cursor">_</span>
+  </p>
 
   <!-- 三个标签 -->
   <div class="tag-row">
@@ -331,6 +339,24 @@ function applyPalette(p){
   root.style.setProperty('--on-primary',t.op);
   root.style.setProperty('--primary-container',t.pc);
   root.style.setProperty('--on-primary-container',t.opc);
+  setCreedColors(t.p); /* 信条 4 段分区着色 */
+}
+
+/* 颜色深浅混合：向白（浅色模式）或向黑（深色模式）渐变 4 档 */
+function shade(hex,toward,t){
+  const n=parseInt(hex.slice(1),16);
+  const r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  const m=toward==='white'?255:0;
+  const f=c=>Math.round(c+(m-c)*t);
+  return '#'+((1<<24)+(f(r)<<16)+(f(g)<<8)+f(b)).toString(16).slice(1);
+}
+/* 信条 4 段颜色：永远(最深) → 相信 → 美好的事情 → 即将发生(最浅) */
+function setCreedColors(primaryHex){
+  const dir=isDark()?'white':'black';
+  root.style.setProperty('--c1',primaryHex);
+  root.style.setProperty('--c2',shade(primaryHex,dir,.25));
+  root.style.setProperty('--c3',shade(primaryHex,dir,.5));
+  root.style.setProperty('--c4',shade(primaryHex,dir,.75));
 }
 
 /* 状态：每次进入随机配色；手动选择仅本次会话生效 */
@@ -372,10 +398,9 @@ function buildSwatches(){
     if(cur&&p.name===cur.name)b.classList.add('active');
     b.onclick=()=>{
       state.mode='manual';state.idx=PALETTES.indexOf(p);
-      applyPalette(p); /* CSS变量变化 → 0.9s 慢速过渡变色 */
+      applyPalette(p); /* CSS变量变化 → 0.9s 慢速过渡变色，面板保持打开实时预览 */
       document.querySelectorAll('.sw').forEach(s=>s.classList.remove('active'));
       b.classList.add('active');
-      closePanel(); /* 点击颜色即缩回 */
     };
     box.appendChild(b);
   });
@@ -408,11 +433,6 @@ function closePanel(){
 }
 paletteBtn.addEventListener('click',()=>{
   if(panel.classList.contains('open')){closePanel();}else{openPanel();}
-});
-document.addEventListener('click',e=>{
-  if(panel.classList.contains('open')&&!panel.contains(e.target)&&!paletteBtn.contains(e.target)){
-    closePanel();
-  }
 });
 
 /* MD3 Ripple */
@@ -450,16 +470,19 @@ document.addEventListener('click',e=>{
   buildSwatches();
 })();
 
-/* 信条打字机效果（两行 · 放大居中） */
-const typeText="永远相信美好的事情\n即将发生";
-const typedEl=document.getElementById('typed');
-let ti=0;
+/* 信条打字机效果（4 段分区着色 · 逐字打出） */
+const creedParts=['永远','相信','美好的事情','即将发生'];
+const creedEls=[document.getElementById('t1'),document.getElementById('t2'),document.getElementById('t3'),document.getElementById('t4')];
+let pi=0,ci=0;
 (function type(){
-  if(ti<=typeText.length){
-    typedEl.textContent=typeText.slice(0,ti);
-    ti++;
-    setTimeout(type,130);
+  if(pi>=creedParts.length)return;
+  creedEls[pi].textContent=creedParts[pi].slice(0,ci);
+  ci++;
+  if(ci>creedParts[pi].length){
+    ci=0;pi++;
+    if(pi>=creedParts.length)return;
   }
+  setTimeout(type,130);
 })();
 </script>
 </body>
