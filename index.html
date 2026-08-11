@@ -198,11 +198,13 @@ footer{
 .palette-panel{
   max-height:0;opacity:0;overflow:hidden;
   margin-bottom:0;
-  transition:max-height .35s cubic-bezier(.2,0,0,1),opacity .3s,margin-bottom .35s;
+  transform:scale(.1);transform-origin:center;
+  transition:max-height .35s cubic-bezier(.2,0,0,1),opacity .3s,margin-bottom .35s,transform .3s cubic-bezier(.2,0,0,1);
 }
 .palette-panel.open{
   max-height:70px;opacity:1;
   margin-bottom:14px;
+  transform:scale(1);
 }
 .swatches{display:flex;justify-content:center;gap:14px;}
 .sw{
@@ -211,8 +213,18 @@ footer{
   cursor:pointer;position:relative;
   transition:transform .2s cubic-bezier(.2,0,0,1),border-color .2s;
 }
-.sw:hover{transform:scale(1.15);}
-.sw.active{border:3px solid var(--on-surface);outline:2px solid var(--primary);outline-offset:1px;transition:border-color .2s,outline-color .5s ease;}
+.sw:hover{border-color:var(--on-surface-variant);} /* 不放大，仅边框加深提示 */
+/* 选中：中央打矢量对勾（不放大） */
+.sw .check{
+  position:absolute;inset:0;margin:auto;
+  width:16px;height:16px;
+  color:var(--surface);
+  opacity:0;transform:scale(.4);
+  transition:opacity .2s,transform .25s cubic-bezier(.2,0,0,1);
+  pointer-events:none;
+}
+.sw.active{border-color:var(--primary);}
+.sw.active .check{opacity:1;transform:scale(1);}
 
 /* ===== Ripple ===== */
 .ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.12;transform:scale(0);animation:ripple .5s ease-out forwards;pointer-events:none;}
@@ -356,6 +368,7 @@ function buildSwatches(){
     b.className='sw';
     b.style.background=isDark()?p.dark.p:p.light.p;
     b.title=p.name;
+    b.innerHTML='<svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
     if(cur&&p.name===cur.name)b.classList.add('active');
     b.onclick=()=>{
       state.mode='manual';state.idx=PALETTES.indexOf(p);
