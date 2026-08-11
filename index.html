@@ -2,7 +2,7 @@
 <html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>xfgken · Material You</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 <style>
@@ -32,14 +32,7 @@
   --outline-variant:#49454F;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{
-  height:100%;
-  overflow:hidden;      /* 禁止页面上下滑动 */
-  overscroll-behavior:none;
-  touch-action:none;    /* 禁止触摸缩放/滚动手势 */
-  -webkit-user-select:none;user-select:none;
-  -webkit-touch-callout:none;
-}
+html{height:100%;}
 
 /* ===== 背景粒子画布（触摸散发 + 随机爆点 · 主题色） ===== */
 #fx{
@@ -440,18 +433,10 @@ function startType(){
   resize();
   addEventListener('resize',resize);
 
-  let color='#6750A4',trail='rgba(255,255,255,0.16)';
-  function parseRGB(v){
-    const m=v.match(/[\d.]+/g);
-    return m?m.slice(0,3).map(Number):null;
-  }
+  let color='#6750A4';
   function readColor(){
-    const root=getComputedStyle(document.documentElement);
-    const c=root.getPropertyValue('--primary').trim();
+    const c=getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
     if(c)color=c;
-    const s=root.getPropertyValue('--surface').trim();
-    const rgb=parseRGB(s);
-    if(rgb)trail='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',0.09)';
   }
   readColor();
 
@@ -459,14 +444,14 @@ function startType(){
   function burst(x,y,n,spread){
     for(let i=0;i<n;i++){
       const a=Math.random()*Math.PI*2;
-      const sp=0.3+Math.random()*spread;
+      const sp=0.4+Math.random()*spread;
       parts.push({
         x:x,y:y,
         vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
-        life:1,r:1.5+Math.random()*2,c:color
+        life:1,r:1.2+Math.random()*1.8,c:color
       });
     }
-    if(parts.length>600)parts.splice(0,parts.length-600);
+    if(parts.length>400)parts.splice(0,parts.length-400);
   }
 
   /* 触摸 / 按住拖动：沿线散发粒子 */
@@ -474,17 +459,17 @@ function startType(){
   addEventListener('pointerdown',e=>{
     active=true;lastX=e.clientX;lastY=e.clientY;
     readColor();
-    burst(e.clientX,e.clientY,16,2.6);
+    burst(e.clientX,e.clientY,10,2.4);
   });
   addEventListener('pointermove',e=>{
     if(!active)return;
     readColor();
     const dx=e.clientX-lastX,dy=e.clientY-lastY;
     const d=Math.hypot(dx,dy);
-    if(d>5){
-      const steps=Math.min(4,Math.floor(d/10)+1);
+    if(d>6){
+      const steps=Math.min(3,Math.floor(d/14)+1);
       for(let s=1;s<=steps;s++){
-        burst(lastX+dx*(s/steps),lastY+dy*(s/steps),3,1.8);
+        burst(lastX+dx*(s/steps),lastY+dy*(s/steps),2,1.6);
       }
       lastX=e.clientX;lastY=e.clientY;
     }
@@ -492,26 +477,25 @@ function startType(){
   addEventListener('pointerup',()=>{active=false;});
   addEventListener('pointercancel',()=>{active=false;});
 
-  /* 无触摸时：屏幕随机位置自动爆点（更频繁 · 更多） */
+  /* 无触摸时：屏幕随机位置自动爆点 */
   (function autoBurst(){
     setTimeout(()=>{
       readColor();
-      burst(Math.random()*W,Math.random()*H,10+Math.floor(Math.random()*9),2.4);
+      burst(Math.random()*W,Math.random()*H,5+Math.floor(Math.random()*6),2.2);
       autoBurst();
-    },300+Math.random()*500);
+    },700+Math.random()*900);
   })();
 
-  /* 渲染循环（拖影：半透明覆盖上一帧 · 粒子寿命更长） */
+  /* 渲染循环 */
   (function loop(){
-    ctx.fillStyle=trail;
-    ctx.fillRect(0,0,W,H);
+    ctx.clearRect(0,0,W,H);
     for(let i=parts.length-1;i>=0;i--){
       const p=parts[i];
       p.x+=p.vx;p.y+=p.vy;
-      p.vx*=0.985;p.vy*=0.985;
-      p.life-=0.007;
+      p.vx*=0.98;p.vy*=0.98;
+      p.life-=0.02;
       if(p.life<=0){parts.splice(i,1);continue;}
-      ctx.globalAlpha=p.life*0.9;
+      ctx.globalAlpha=p.life;
       ctx.fillStyle=p.c;
       ctx.beginPath();
       ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
