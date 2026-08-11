@@ -142,17 +142,18 @@ body{
   background:var(--surface-container-low);
   border:1px solid var(--outline-variant);
   border-radius:24px;padding:20px;margin-top:16px;
+  min-inline-size:0;
   transition:background-color .9s ease,border-color .9s ease,color .9s ease;
 }
-/* 标题嵌在卡片顶部边框线中间（上下居中 · 左右居中） */
-.card::before{
-  content:attr(data-title);
-  position:absolute;top:-8px;left:50%;transform:translateX(-50%);
-  background:var(--surface);
+/* 标题嵌在卡片顶部边框线中间（原生 legend · 透明背景 · 上下居中） */
+.card legend{
+  margin:0 auto;
+  padding:0 12px;
   color:var(--on-surface-variant);
   font-size:13px;font-weight:700;letter-spacing:3px;
-  padding:0 12px;white-space:nowrap;
-  transition:color .9s ease,background-color .9s ease;
+  white-space:nowrap;text-align:center;
+  background:transparent;
+  transition:color .9s ease;
 }
 .card-ico{
   width:44px;height:44px;border-radius:14px;flex-shrink:0;
@@ -276,7 +277,8 @@ footer{
   </div>
 
   <!-- 项目 -->
-  <section class="card proj" data-title="我的项目">
+  <fieldset class="card proj">
+    <legend>我的项目</legend>
     <div class="phead">
       <div class="card-ico"><span class="material-symbols-outlined">terminal</span></div>
       <div>
@@ -289,15 +291,16 @@ footer{
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
       GitHub 仓库
     </a>
-  </section>
+  </fieldset>
 
   <!-- 联系我 -->
-  <section class="card contact" data-title="联系我">
+  <fieldset class="card contact">
+    <legend>联系我</legend>
     <div class="cbody">
       <div class="card-ico"><span class="material-symbols-outlined">mail</span></div>
       <a class="t" href="mailto:xfgken@gmail.com">欢迎交流，可通过邮箱联系<b>xfgken@gmail.com</b></a>
     </div>
-  </section>
+  </fieldset>
 </main>
 
 <footer>©2026 xfgken · Material You</footer>
