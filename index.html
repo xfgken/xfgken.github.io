@@ -111,7 +111,6 @@ body{
   width:100%;
   margin-bottom:14px;
   text-align:center;
-  white-space:pre-line;
   transition:color .9s ease;
 }
 .creed-text span{transition:color .9s ease;}
@@ -242,7 +241,7 @@ footer{
   <!-- 我的信条：打字机效果（4 段分区着色 · 两行） -->
   <p class="creed-text">
     <span class="c1" id="t1"></span><span class="c2" id="t2"></span><span class="c3" id="t3"></span><br>
-    <span class="c4" id="t4"></span><span class="cursor">_</span>
+    <span class="c4" id="t4"></span><span class="cursor" id="creedCursor">_</span>
   </p>
 
   <!-- 三个标签 -->
@@ -406,17 +405,21 @@ document.addEventListener('click',e=>{
   if(p)applyPalette(p);
 })();
 
-/* 信条打字机效果（4 段分区着色 · 逐字打出） */
+/* 信条打字机效果（4 段分区着色 · 光标跟随逐字闪烁） */
 const creedParts=['永远','相信','美好的事情','即将发生'];
 const creedEls=[document.getElementById('t1'),document.getElementById('t2'),document.getElementById('t3'),document.getElementById('t4')];
+const creedCursor=document.getElementById('creedCursor');
 let pi=0,ci=0;
 (function type(){
   if(pi>=creedParts.length)return;
-  creedEls[pi].textContent=creedParts[pi].slice(0,ci);
+  const el=creedEls[pi];
+  const part=creedParts[pi];
+  el.textContent=part.slice(0,ci);
+  el.after(creedCursor); /* 光标紧跟当前正在打的字 */
   ci++;
-  if(ci>creedParts[pi].length){
+  if(ci>part.length){
     ci=0;pi++;
-    if(pi>=creedParts.length)return;
+    if(pi>=creedParts.length)return; /* 全部打完，光标停在最后继续闪烁 */
   }
   setTimeout(type,130);
 })();
