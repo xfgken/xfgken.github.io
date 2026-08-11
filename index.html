@@ -102,12 +102,12 @@ body{
 
 .app{max-width:640px;width:100%;margin:0 auto;padding:18px 16px 8px;flex:1;}
 
-/* ===== 我的信条（打字机 · 放大 · 居中） ===== */
+/* ===== 我的信条（打字机 · 放大 · 居中 · 紧凑行距） ===== */
 .creed-text{
   font-size:clamp(26px,7.5vw,34px);
-  font-weight:700;letter-spacing:.5px;line-height:1.5;
+  font-weight:700;letter-spacing:.5px;line-height:1.25;
   color:var(--on-surface);
-  min-height:80px;
+  min-height:70px;
   width:100%;
   margin-bottom:14px;
   text-align:center;
@@ -199,37 +199,10 @@ footer{
   transition:color .9s ease;
 }
 
-/* ===== 调色板：内嵌主页面（信条上方 · 无框无背景 · 原封不动往上推） ===== */
-.palette-panel{
-  max-height:0;opacity:0;overflow:hidden;
-  margin-bottom:0;
-  transform:translateY(10px);
-  transition:max-height .3s cubic-bezier(.2,0,0,1),opacity .25s,margin-bottom .3s,transform .3s cubic-bezier(.2,0,0,1);
-}
-.palette-panel.open{
-  max-height:70px;opacity:1;
-  margin-bottom:14px;
-  transform:translateY(0);
-}
-.swatches{display:flex;justify-content:center;gap:14px;}
-.sw{
-  width:42px;height:42px;border-radius:50%;
-  border:2px solid var(--outline-variant);
-  cursor:pointer;position:relative;
-  transition:transform .2s cubic-bezier(.2,0,0,1),border-color .2s;
-}
-.sw:hover{border-color:var(--on-surface-variant);} /* 不放大，仅边框加深提示 */
-/* 选中：中央打矢量对勾（不放大） */
-.sw .check{
-  position:absolute;inset:0;margin:auto;
-  width:16px;height:16px;
-  color:var(--surface);
-  opacity:0;transform:scale(.4);
-  transition:opacity .2s,transform .25s cubic-bezier(.2,0,0,1);
-  pointer-events:none;
-}
-.sw.active{border-color:var(--primary);}
-.sw.active .check{opacity:1;transform:scale(1);}
+/* ===== 换色按钮图标（palette ↔ refresh 交替） ===== */
+.palette-ico{position:relative;width:24px;height:24px;display:block;transition:transform .6s cubic-bezier(.2,0,0,1);}
+.palette-ico.spin{transform:rotate(360deg);}
+.palette-ico .ms{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .4s cubic-bezier(.2,0,0,1),opacity .25s;}
 
 /* ===== Ripple ===== */
 .ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.12;transform:scale(0);animation:ripple .5s ease-out forwards;pointer-events:none;}
@@ -257,18 +230,15 @@ footer{
         <span class="ms moon material-symbols-outlined">dark_mode</span>
       </span>
     </button>
-    <button class="icon-btn" id="paletteBtn" title="调色板">
-      <span class="material-symbols-outlined">palette</span>
+    <button class="icon-btn" id="paletteBtn" title="换色">
+      <span class="palette-ico" id="paletteIco">
+        <span class="ms material-symbols-outlined">palette</span>
+      </span>
     </button>
   </div>
 </header>
 
 <main class="app">
-  <!-- 调色板：内嵌信条上方，点击调色板按钮展开/收起 -->
-  <div class="palette-panel" id="palettePanel">
-    <div class="swatches" id="swatches"></div>
-  </div>
-
   <!-- 我的信条：打字机效果（4 段分区着色 · 两行） -->
   <p class="creed-text">
     <span class="c1" id="t1"></span> <span class="c2" id="t2"></span> <span class="c3" id="t3"></span><br>
@@ -359,51 +329,22 @@ function setCreedColors(primaryHex){
   root.style.setProperty('--c4',shade(primaryHex,dir,.75));
 }
 
-/* 状态：每次进入随机配色；手动选择仅本次会话生效 */
-let autoPick=null;
-let state={mode:'auto',idx:0};
+/* 状态：默认紫色（每次打开网页）；点击换色按钮随机换色 */
+let state={idx:0};
 
-/* 当前配色：auto=本次进入随机一次；manual=用户选择 */
+/* 当前配色：默认紫色 */
 function currentPalette(){
-  if(state.mode==='manual'){
-    return PALETTES[state.idx]||PALETTES[0];
-  }
-  if(!autoPick){
-    autoPick=PALETTES[Math.floor(Math.random()*PALETTES.length)];
-  }
-  return autoPick;
+  return PALETTES[state.idx]||PALETTES[0];
 }
 
-/* 随机抽取 5 种配色供选择 */
-function pickRandom(n){
-  const arr=[...PALETTES],out=[];
-  while(arr.length&&out.length<n){
-    out.push(arr.splice(Math.floor(Math.random()*arr.length),1)[0]);
-  }
-  return out;
-}
-
-/* 构建 5 色板 */
-function buildSwatches(){
-  const box=document.getElementById('swatches');
-  box.innerHTML='';
-  const list=pickRandom(5);
-  const cur=currentPalette();
-  list.forEach(p=>{
-    const b=document.createElement('button');
-    b.className='sw';
-    b.style.background=isDark()?p.dark.p:p.light.p;
-    b.title=p.name;
-    b.innerHTML='<svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
-    if(cur&&p.name===cur.name)b.classList.add('active');
-    b.onclick=()=>{
-      state.mode='manual';state.idx=PALETTES.indexOf(p);
-      applyPalette(p); /* CSS变量变化 → 0.9s 慢速过渡变色，面板保持打开实时预览 */
-      document.querySelectorAll('.sw').forEach(s=>s.classList.remove('active'));
-      b.classList.add('active');
-    };
-    box.appendChild(b);
-  });
+/* 随机换一个颜色（不与当前相同） */
+function randomizeColor(){
+  let idx;
+  do{
+    idx=Math.floor(Math.random()*PALETTES.length);
+  }while(idx===state.idx&&PALETTES.length>1);
+  state.idx=idx;
+  applyPalette(PALETTES[idx]);
 }
 
 /* 深浅切换：图标旋转360° + 页面慢速变暗 */
@@ -417,27 +358,35 @@ themeBtn.addEventListener('click',()=>{
   localStorage.setItem(LS+'theme',isDark()?'dark':'light');
   const cur=currentPalette();
   if(cur)applyPalette(cur);
-  buildSwatches();
   setTimeout(()=>themeIco.classList.remove('spin'),650);
 });
 
-/* 调色板：居中弹出，点击按钮开关 */
-const panel=document.getElementById('palettePanel');
+/* 换色按钮：palette 图标 → 0.5s 后变 refresh 并随机换色；refresh 旋转换色后回 palette */
 const paletteBtn=document.getElementById('paletteBtn');
-function openPanel(){
-  buildSwatches();
-  panel.classList.add('open');
-}
-function closePanel(){
-  panel.classList.remove('open');
-}
+const paletteIco=document.getElementById('paletteIco');
+const paletteMs=paletteIco.querySelector('.ms');
+let iconMode='palette';
 paletteBtn.addEventListener('click',()=>{
-  if(panel.classList.contains('open')){closePanel();}else{openPanel();}
+  if(iconMode==='palette'){
+    setTimeout(()=>{
+      paletteMs.textContent='refresh';
+      iconMode='refresh';
+      randomizeColor();
+    },500);
+  }else{
+    paletteIco.classList.remove('spin');
+    void paletteIco.offsetWidth;
+    paletteIco.classList.add('spin');
+    randomizeColor();
+    paletteMs.textContent='palette';
+    iconMode='palette';
+    setTimeout(()=>paletteIco.classList.remove('spin'),650);
+  }
 });
 
 /* MD3 Ripple */
 document.addEventListener('click',e=>{
-  const btn=e.target.closest('.icon-btn,.btn,.sw');
+  const btn=e.target.closest('.icon-btn,.btn');
   if(!btn)return;
   const rect=btn.getBoundingClientRect();
   const size=Math.max(rect.width,rect.height);
@@ -461,13 +410,12 @@ document.addEventListener('click',e=>{
   setTimeout(hide,2500);
 })();
 
-/* 初始化：每次进入随机配色 */
+/* 初始化：默认紫色 */
 (function init(){
   const savedTheme=localStorage.getItem(LS+'theme');
   if(savedTheme)root.setAttribute('data-theme',savedTheme);
   const p=currentPalette();
   if(p)applyPalette(p);
-  buildSwatches();
 })();
 
 /* 信条打字机效果（4 段分区着色 · 逐字打出） */
