@@ -34,36 +34,10 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 html{height:100%;}
 
-/* ===== 页面加载动画（安卓原生 MD3 圆形进度指示器） ===== */
-#loading{
-  position:fixed;inset:0;z-index:99;
-  background:var(--surface);
-  display:flex;align-items:center;justify-content:center;
-  opacity:1;visibility:visible;
-  transition:opacity .6s ease,visibility .6s ease;
-}
-#loading.hide{opacity:0;visibility:hidden;pointer-events:none;}
-/* 安卓原生 MD3 加载动画（波浪弧：伸缩+旋转+尾部渐隐，非单纯转圈） */
-.spinner{
-  width:44px;height:44px;
-  animation:spin 1.4s linear infinite;
-}
-.spinner .path{
-  fill:none;
-  stroke:url(#md3grad);
-  stroke-width:4;
-  stroke-linecap:round;
-  stroke-dasharray:1 200;
-  stroke-dashoffset:0;
-  animation:dash 1.4s ease-in-out infinite;
-}
-.spinner stop.s0{stop-color:var(--primary);stop-opacity:0;}
-.spinner stop.s1{stop-color:var(--primary);stop-opacity:1;}
-@keyframes spin{to{transform:rotate(360deg);}}
-@keyframes dash{
-  0%{stroke-dasharray:1 200;stroke-dashoffset:0;}
-  50%{stroke-dasharray:89 200;stroke-dashoffset:-35;}
-  100%{stroke-dasharray:89 200;stroke-dashoffset:-124;}
+/* ===== 背景粒子画布（触摸散发 + 随机爆点 · 主题色） ===== */
+#fx{
+  position:fixed;inset:0;z-index:-1;
+  pointer-events:none;
 }
 
 body{
@@ -238,18 +212,8 @@ footer{
 </head>
 <body>
 
-<!-- 加载动画遮罩（安卓原生 MD3 波浪加载 · 1.5s） -->
-<div id="loading">
-  <svg class="spinner" viewBox="0 0 48 48" aria-hidden="true">
-    <defs>
-      <linearGradient id="md3grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop class="s0" offset="0%"></stop>
-        <stop class="s1" offset="100%"></stop>
-      </linearGradient>
-    </defs>
-    <circle class="path" cx="24" cy="24" r="20" transform="rotate(-90 24 24)"></circle>
-  </svg>
-</div>
+<!-- 背景粒子画布（触摸散发 · 随机爆点） -->
+<canvas id="fx"></canvas>
 
 <!-- Top App Bar -->
 <header class="appbar">
@@ -418,20 +382,8 @@ document.addEventListener('click',e=>{
   setTimeout(()=>r.remove(),500);
 });
 
-/* 页面加载完成后：1.5s 后隐藏加载动画（含兜底），随后开始打字 */
-(function hideLoading(){
-  const hide=()=>{
-    const l=document.getElementById('loading');
-    if(l)l.classList.add('hide');
-    setTimeout(startType,600); /* 遮罩淡出后开始打字机 */
-  };
-  if(document.readyState==='complete'){
-    setTimeout(hide,1500);
-  }else{
-    window.addEventListener('load',()=>setTimeout(hide,1500));
-  }
-  setTimeout(()=>{const l=document.getElementById('loading');if(l&&!l.classList.contains('hide')){l.classList.add('hide');setTimeout(startType,600);}},3500);
-})();
+/* 页面加载完成后开始打字（无载入动画，直接逐字打出） */
+window.addEventListener('load',startType);
 
 /* 初始化：默认紫色 */
 (function init(){
@@ -464,6 +416,95 @@ function startType(){
     setTimeout(type,220);
   })();
 }
+
+/* ===== 背景粒子特效（触摸滑动散发 + 无触摸随机爆点 · 跟随主题色） ===== */
+(function(){
+  const cv=document.getElementById('fx');
+  if(!cv)return;
+  const ctx=cv.getContext('2d');
+  let W=0,H=0;
+  const DPR=Math.min(window.devicePixelRatio||1,2);
+  function resize(){
+    W=innerWidth;H=innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;
+    cv.style.width=W+'px';cv.style.height=H+'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  resize();
+  addEventListener('resize',resize);
+
+  let color='#6750A4';
+  function readColor(){
+    const c=getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+    if(c)color=c;
+  }
+  readColor();
+
+  const parts=[];
+  function burst(x,y,n,spread){
+    for(let i=0;i<n;i++){
+      const a=Math.random()*Math.PI*2;
+      const sp=0.4+Math.random()*spread;
+      parts.push({
+        x:x,y:y,
+        vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+        life:1,r:1.2+Math.random()*1.8,c:color
+      });
+    }
+    if(parts.length>400)parts.splice(0,parts.length-400);
+  }
+
+  /* 触摸 / 按住拖动：沿线散发粒子 */
+  let lastX=0,lastY=0,active=false;
+  addEventListener('pointerdown',e=>{
+    active=true;lastX=e.clientX;lastY=e.clientY;
+    readColor();
+    burst(e.clientX,e.clientY,10,2.4);
+  });
+  addEventListener('pointermove',e=>{
+    if(!active)return;
+    readColor();
+    const dx=e.clientX-lastX,dy=e.clientY-lastY;
+    const d=Math.hypot(dx,dy);
+    if(d>6){
+      const steps=Math.min(3,Math.floor(d/14)+1);
+      for(let s=1;s<=steps;s++){
+        burst(lastX+dx*(s/steps),lastY+dy*(s/steps),2,1.6);
+      }
+      lastX=e.clientX;lastY=e.clientY;
+    }
+  });
+  addEventListener('pointerup',()=>{active=false;});
+  addEventListener('pointercancel',()=>{active=false;});
+
+  /* 无触摸时：屏幕随机位置自动爆点 */
+  (function autoBurst(){
+    setTimeout(()=>{
+      readColor();
+      burst(Math.random()*W,Math.random()*H,5+Math.floor(Math.random()*6),2.2);
+      autoBurst();
+    },700+Math.random()*900);
+  })();
+
+  /* 渲染循环 */
+  (function loop(){
+    ctx.clearRect(0,0,W,H);
+    for(let i=parts.length-1;i>=0;i--){
+      const p=parts[i];
+      p.x+=p.vx;p.y+=p.vy;
+      p.vx*=0.98;p.vy*=0.98;
+      p.life-=0.02;
+      if(p.life<=0){parts.splice(i,1);continue;}
+      ctx.globalAlpha=p.life;
+      ctx.fillStyle=p.c;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    requestAnimationFrame(loop);
+  })();
+})();
 </script>
 </body>
 </html>
