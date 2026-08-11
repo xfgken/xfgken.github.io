@@ -78,24 +78,24 @@ body{
   transition:background-color .9s ease;
 }
 .appbar .title{font-size:31px;font-weight:800;letter-spacing:.3px;color:var(--primary);transition:color .9s ease;}
-.appbar-actions{display:flex;gap:8px;}
+.appbar-actions{display:flex;gap:6px;}
 
-/* ===== MD3 圆形图标按钮（无阴影 · 缩小版 · 浅色外框） ===== */
+/* ===== MD3 圆形图标按钮（无阴影 · 小尺寸 · 颜色框：浅色圆形填充底） ===== */
 .icon-btn{
   position:relative;overflow:hidden;
-  width:40px;height:40px;border-radius:50%;
-  border:1px solid var(--outline-variant);cursor:pointer;
-  background:transparent;color:var(--on-surface);
+  width:32px;height:32px;border-radius:50%;
+  border:none;cursor:pointer;
+  background:var(--surface-container-high);color:var(--on-surface);
   display:inline-flex;align-items:center;justify-content:center;
-  transition:background-color .2s,color .9s ease,border-color .9s ease,transform .1s;
+  transition:background-color .2s,color .9s ease,transform .1s;
 }
-.icon-btn:hover{background:rgba(128,128,128,.12);}
+.icon-btn:hover{background:var(--surface-container-high);filter:brightness(.96);}
 .icon-btn:active{transform:scale(.88);}
 
 /* 主题图标：太阳/月亮 旋转+交叉淡入 */
-.theme-ico{position:relative;width:17px;height:17px;display:block;transition:transform .6s cubic-bezier(.2,0,0,1);}
+.theme-ico{position:relative;width:14px;height:14px;display:block;transition:transform .6s cubic-bezier(.2,0,0,1);}
 .theme-ico.spin{transform:rotate(360deg);}
-.theme-ico .ms{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;transition:transform .5s cubic-bezier(.2,0,0,1),opacity .3s;}
+.theme-ico .ms{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;transition:transform .5s cubic-bezier(.2,0,0,1),opacity .3s;}
 .theme-ico .sun{opacity:1;transform:rotate(0deg) scale(1);}
 .theme-ico .moon{opacity:0;transform:rotate(-90deg) scale(.2);}
 [data-theme="dark"] .theme-ico .sun{opacity:0;transform:rotate(90deg) scale(.2);}
@@ -150,23 +150,19 @@ body{
   min-inline-size:0;
   transition:background-color .9s ease,border-color .9s ease,color .9s ease;
 }
-/* ===== 卡片外侧标题行（竖条点缀 + 文字靠左 + 横线延伸） ===== */
+/* ===== 卡片外侧标题行（竖条点缀 + 文字 · 无横线） ===== */
 .sec-head{
   display:flex;align-items:center;gap:8px;
   margin-top:16px;
   color:var(--on-surface-variant);
   font-size:13px;font-weight:700;letter-spacing:3px;
   white-space:nowrap;
+  line-height:13px;
   transition:color .9s ease;
 }
 .sec-head .vbar{
-  width:3px;height:14px;border-radius:2px;
+  width:3px;height:13px;border-radius:2px;
   background:var(--primary);
-  transition:background-color .9s ease;
-}
-.sec-head::after{
-  content:'';flex:1;height:1px;background:var(--outline-variant);
-  margin-left:10px;
   transition:background-color .9s ease;
 }
 .sec-head+.card{margin-top:8px;}
@@ -209,10 +205,10 @@ footer{
   transition:color .9s ease;
 }
 
-/* ===== 换色按钮图标（点击旋转 + 随机换色 · 缩小版） ===== */
-.palette-ico{position:relative;width:17px;height:17px;display:block;transition:transform .6s cubic-bezier(.2,0,0,1);}
+/* ===== 换色按钮图标（点击旋转 + 随机换色 · 小尺寸） ===== */
+.palette-ico{position:relative;width:14px;height:14px;display:block;transition:transform .6s cubic-bezier(.2,0,0,1);}
 .palette-ico.spin{transform:rotate(360deg);}
-.palette-ico .ms{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;transition:transform .4s cubic-bezier(.2,0,0,1),opacity .25s;}
+.palette-ico .ms{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;transition:transform .4s cubic-bezier(.2,0,0,1),opacity .25s;}
 
 /* ===== Ripple ===== */
 .ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.12;transform:scale(0);animation:ripple .5s ease-out forwards;pointer-events:none;}
