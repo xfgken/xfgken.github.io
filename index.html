@@ -119,6 +119,15 @@ body{
 .creed-text .c2{color:var(--c2);}
 .creed-text .c3{color:var(--c3);}
 .creed-text .c4{color:var(--c4);}
+/* 打字机字符级丝滑淡入（每字符独立过渡，无卡顿） */
+.creed-text .ch{
+  display:inline-block;
+  opacity:0;transform:translateY(6px);
+  transition:opacity .25s ease,transform .25s ease,color .9s ease;
+}
+.creed-text .ch.show{
+  opacity:1;transform:translateY(0);
+}
 .cursor{
   display:inline-block;font-weight:800;
   animation:blink .9s step-end infinite;
@@ -414,24 +423,36 @@ document.addEventListener('click',e=>{
   if(p)applyPalette(p);
 })();
 
-/* 信条打字机效果（4 段分区着色 · 光标跟随逐字闪烁） */
+/* 信条打字机效果（4 段分区着色 · 字符级淡入 · rAF 时间驱动 · 丝滑无卡顿） */
 const creedParts=['永远','相信','美好的事情','即将发生'];
 const creedEls=[document.getElementById('t1'),document.getElementById('t2'),document.getElementById('t3'),document.getElementById('t4')];
 const creedCursor=document.getElementById('creedCursor');
-let pi=0,ci=0;
-(function type(){
-  if(pi>=creedParts.length)return;
-  const el=creedEls[pi];
-  const part=creedParts[pi];
-  el.textContent=part.slice(0,ci);
-  el.after(creedCursor); /* 光标紧跟当前正在打的字 */
-  ci++;
-  if(ci>part.length){
-    ci=0;pi++;
-    if(pi>=creedParts.length)return; /* 全部打完，光标停在最后继续闪烁 */
+const CHAR_MS=120; /* 每字符间隔（毫秒） */
+const chars=[];
+creedParts.forEach((part,pi)=>{
+  for(const ch of part){
+    const s=document.createElement('span');
+    s.className='ch';
+    s.textContent=ch;
+    creedEls[pi].appendChild(s);
+    chars.push({el:s,parent:creedEls[pi]});
   }
-  setTimeout(type,220);
-})();
+});
+let idx=0,last=0;
+(function tick(t){
+  if(!last)last=t;
+  if(t-last>=CHAR_MS){
+    last=t;
+    if(idx<chars.length){
+      chars[idx].el.classList.add('show'); /* 平滑淡入上浮 */
+      chars[idx].parent.appendChild(creedCursor); /* 光标紧跟当前字 */
+      idx++;
+    }else{
+      return; /* 全部打完，光标停在末尾继续闪烁 */
+    }
+  }
+  requestAnimationFrame(tick);
+})(performance.now());
 </script>
 </body>
 </html>
