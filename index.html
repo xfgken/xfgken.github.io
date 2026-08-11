@@ -43,19 +43,28 @@ html{height:100%;}
   transition:opacity .6s ease,visibility .6s ease;
 }
 #loading.hide{opacity:0;visibility:hidden;pointer-events:none;}
-/* MD3 Circular Progress Indicator：细圆环 · 圆头线帽 · 约3/4弧 · 匀速旋转 */
+/* 安卓原生 MD3 加载动画（波浪弧：伸缩+旋转+尾部渐隐，非单纯转圈） */
 .spinner{
-  width:40px;height:40px;
-  animation:spin .9s linear infinite;
+  width:44px;height:44px;
+  animation:spin 1.4s linear infinite;
 }
-.spinner circle{
+.spinner .path{
   fill:none;
-  stroke:var(--primary);
+  stroke:url(#md3grad);
   stroke-width:4;
   stroke-linecap:round;
-  stroke-dasharray:94 31.6;
+  stroke-dasharray:1 200;
+  stroke-dashoffset:0;
+  animation:dash 1.4s ease-in-out infinite;
 }
+.spinner stop.s0{stop-color:var(--primary);stop-opacity:0;}
+.spinner stop.s1{stop-color:var(--primary);stop-opacity:1;}
 @keyframes spin{to{transform:rotate(360deg);}}
+@keyframes dash{
+  0%{stroke-dasharray:1 200;stroke-dashoffset:0;}
+  50%{stroke-dasharray:89 200;stroke-dashoffset:-35;}
+  100%{stroke-dasharray:89 200;stroke-dashoffset:-124;}
+}
 
 body{
   font-family:'Baloo 2','MiSans','HarmonyOS Sans SC','HarmonyOS Sans','MiUI','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
@@ -125,15 +134,6 @@ body{
 .creed-text .c2{color:var(--c2);}
 .creed-text .c3{color:var(--c3);}
 .creed-text .c4{color:var(--c4);}
-/* 打字机字符级丝滑淡入（无位移 · 一个字一个字自然浮现） */
-.creed-text .ch{
-  display:inline-block;
-  opacity:0;
-  transition:opacity .25s ease,color .9s ease;
-}
-.creed-text .ch.show{
-  opacity:1;
-}
 .cursor{
   display:inline-block;font-weight:800;
   animation:blink .9s step-end infinite;
@@ -238,10 +238,16 @@ footer{
 </head>
 <body>
 
-<!-- 加载动画遮罩（MD3 转圈圈 · 1.5s） -->
+<!-- 加载动画遮罩（安卓原生 MD3 波浪加载 · 1.5s） -->
 <div id="loading">
   <svg class="spinner" viewBox="0 0 48 48" aria-hidden="true">
-    <circle cx="24" cy="24" r="20" transform="rotate(-90 24 24)"></circle>
+    <defs>
+      <linearGradient id="md3grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop class="s0" offset="0%"></stop>
+        <stop class="s1" offset="100%"></stop>
+      </linearGradient>
+    </defs>
+    <circle class="path" cx="24" cy="24" r="20" transform="rotate(-90 24 24)"></circle>
   </svg>
 </div>
 
@@ -435,41 +441,28 @@ document.addEventListener('click',e=>{
   if(p)applyPalette(p);
 })();
 
-/* 信条打字机效果（4 段分区着色 · 字符级淡入 · rAF 时间驱动 · 丝滑无卡顿）
-   由载入动画结束后调用 startType() 启动 */
+/* 信条打字机效果（4 段分区着色 · 逐字切换无动画 · 载入后启动） */
 const creedParts=['永远','相信','美好的事情','即将发生'];
 const creedEls=[document.getElementById('t1'),document.getElementById('t2'),document.getElementById('t3'),document.getElementById('t4')];
 const creedCursor=document.getElementById('creedCursor');
-const CHAR_MS=120; /* 每字符间隔（毫秒） */
-const chars=[];
-creedParts.forEach((part,pi)=>{
-  for(const ch of part){
-    const s=document.createElement('span');
-    s.className='ch';
-    s.textContent=ch;
-    creedEls[pi].appendChild(s);
-    chars.push({el:s,parent:creedEls[pi]});
-  }
-});
 let typingStarted=false;
 function startType(){
   if(typingStarted)return;
   typingStarted=true;
-  let idx=0,last=0;
-  (function tick(t){
-    if(!last)last=t;
-    if(t-last>=CHAR_MS){
-      last=t;
-      if(idx<chars.length){
-        chars[idx].el.classList.add('show'); /* 平滑淡入 */
-        chars[idx].parent.appendChild(creedCursor); /* 光标紧跟当前字 */
-        idx++;
-      }else{
-        return; /* 全部打完，光标停在末尾继续闪烁 */
-      }
+  let pi=0,ci=0;
+  (function type(){
+    if(pi>=creedParts.length)return;
+    const el=creedEls[pi];
+    const part=creedParts[pi];
+    el.textContent=part.slice(0,ci);
+    el.after(creedCursor); /* 光标紧跟当前正在打的字 */
+    ci++;
+    if(ci>part.length){
+      ci=0;pi++;
+      if(pi>=creedParts.length)return; /* 全部打完，光标停在最后继续闪烁 */
     }
-    requestAnimationFrame(tick);
-  })(performance.now());
+    setTimeout(type,220);
+  })();
 }
 </script>
 </body>
