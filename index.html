@@ -136,25 +136,23 @@ body{
 }
 .tag .material-symbols-outlined{font-size:18px;color:var(--primary);transition:color .9s ease;}
 
-/* ===== 卡片标题分隔线（横线居中嵌标题） ===== */
-.sec-head{
-  display:flex;align-items:center;gap:12px;
-  margin-bottom:14px;
-  color:var(--on-surface-variant);
-  transition:color .9s ease;
-}
-.sec-head::before,.sec-head::after{
-  content:'';flex:1;height:1px;background:var(--outline-variant);
-  transition:background-color .9s ease;
-}
-.sec-head span{font-size:13px;font-weight:700;letter-spacing:3px;white-space:nowrap;}
-
-/* ===== 卡片（圆角矩形 · 同色系浅深） ===== */
+/* ===== 卡片（圆角矩形 · 同色系浅深 · 顶部边框嵌标题） ===== */
 .card{
+  position:relative;
   background:var(--surface-container-low);
   border:1px solid var(--outline-variant);
   border-radius:24px;padding:20px;margin-top:16px;
   transition:background-color .9s ease,border-color .9s ease,color .9s ease;
+}
+/* 标题嵌在卡片顶部边框线中间（上下居中 · 左右居中） */
+.card::before{
+  content:attr(data-title);
+  position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  background:var(--surface);
+  color:var(--on-surface-variant);
+  font-size:13px;font-weight:700;letter-spacing:3px;
+  padding:0 12px;white-space:nowrap;
+  transition:color .9s ease,background-color .9s ease;
 }
 .card-ico{
   width:44px;height:44px;border-radius:14px;flex-shrink:0;
@@ -278,8 +276,7 @@ footer{
   </div>
 
   <!-- 项目 -->
-  <section class="card proj">
-    <div class="sec-head"><span>我的项目</span></div>
+  <section class="card proj" data-title="我的项目">
     <div class="phead">
       <div class="card-ico"><span class="material-symbols-outlined">terminal</span></div>
       <div>
@@ -295,8 +292,7 @@ footer{
   </section>
 
   <!-- 联系我 -->
-  <section class="card contact">
-    <div class="sec-head"><span>联系我</span></div>
+  <section class="card contact" data-title="联系我">
     <div class="cbody">
       <div class="card-ico"><span class="material-symbols-outlined">mail</span></div>
       <a class="t" href="mailto:xfgken@gmail.com">欢迎交流，可通过邮箱联系<b>xfgken@gmail.com</b></a>
