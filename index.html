@@ -408,8 +408,10 @@ function buildSwatches(){
       localStorage.setItem(LS+'mode','manual');
       localStorage.setItem(LS+'idx',String(state.idx));
       localStorage.removeItem(LS+'custom');
-      applyPalette(p); /* CSS变量变化 → 0.9s 慢速过渡变色 */
-      buildSwatches();
+      applyPalette(p); /* CSS变量变化 → 0.9s 慢速过渡变色，面板保持打开实时预览 */
+      /* 只更新高亮，不重建色板，方便连续点击预览 */
+      document.querySelectorAll('.sw').forEach(s=>s.classList.remove('active'));
+      b.classList.add('active');
     };
     box.appendChild(b);
   });
