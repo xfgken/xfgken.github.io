@@ -91,14 +91,18 @@ body{
   transition:background-color .9s ease;
 }
 .terminal-bar{
-  display:flex;align-items:center;gap:6px;
+  display:flex;align-items:center;justify-content:space-between;
   padding:12px 16px;
   background:var(--primary);
   color:var(--on-primary);
   transition:background-color .9s ease,color .9s ease;
 }
-.terminal-bar .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.35);}
-.terminal-bar .t-title{margin-left:8px;font-size:12px;font-weight:700;letter-spacing:.5px;opacity:.85;}
+.terminal-bar .t-title{font-size:13px;font-weight:700;letter-spacing:1px;opacity:.9;}
+.terminal-bar .dots{display:flex;align-items:center;gap:6px;}
+.terminal-bar .dot{width:11px;height:11px;border-radius:50%;}
+.terminal-bar .dot.close{background:#B3261E;}
+.terminal-bar .dot.max{background:#006C4C;}
+.terminal-bar .dot.min{background:#7A5900;}
 .terminal-body{
   padding:22px 18px;
   font-family:'Baloo 2','JetBrains Mono','Consolas','Courier New',monospace;
@@ -154,8 +158,8 @@ body{
 
 /* MD3 Filled Button（无阴影） */
 .btn{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  width:100%;height:48px;border-radius:24px;border:none;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  width:50%;min-width:160px;height:48px;border-radius:24px;border:none;cursor:pointer;
   background:var(--primary);color:var(--on-primary);
   font-size:15px;font-weight:700;letter-spacing:1px;text-decoration:none;
   font-family:inherit;position:relative;overflow:hidden;
@@ -180,19 +184,18 @@ footer{
 
 /* ===== 调色板面板：从右上角按钮整体缩放（圆形→方形，圆角连续过渡） ===== */
 .palette-panel{
-  position:fixed;top:72px;right:16px;z-index:21;
+  position:fixed;left:50%;top:50%;z-index:21;
   width:min(380px,calc(100vw - 32px));
   padding:24px;
   background:var(--surface-container-high);
   color:var(--on-surface);
   border-radius:50%;
-  transform-origin:top right;
-  transform:scale(.1);
+  transform:translate(-50%,-50%) scale(.6);
   opacity:0;pointer-events:none;
   transition:transform .45s cubic-bezier(.2,0,0,1),border-radius .45s cubic-bezier(.2,0,0,1),opacity .25s,background-color .9s ease;
 }
 .palette-panel.open{
-  transform:scale(1);
+  transform:translate(-50%,-50%) scale(1);
   border-radius:24px;
   opacity:1;pointer-events:auto;
 }
@@ -242,13 +245,8 @@ footer{
 <div class="palette-panel" id="palettePanel">
   <div class="inner">
     <h3>调色板</h3>
-    <p class="hint">点击颜色 · 缓慢过渡 · 默认紫色</p>
+    <p class="hint">点击颜色 · 缓慢过渡 · 每次随机 5 种配色</p>
     <div class="swatches" id="swatches"></div>
-    <div class="custom-row">
-      <label>自定义颜色</label>
-      <input type="color" class="color-input" id="colorInput" value="#6750A4">
-      <span class="hex" id="hexText">#6750A4</span>
-    </div>
     <div class="actions">
       <button class="text-btn" id="closeDialog">完成</button>
     </div>
@@ -275,8 +273,12 @@ footer{
   <!-- 我的信条：终端打字效果 -->
   <section class="terminal">
     <div class="terminal-bar">
-      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      <span class="t-title">xfgken@localhost: ~</span>
+      <span class="t-title">我的信条</span>
+      <div class="dots">
+        <span class="dot close" title="擦掉"></span>
+        <span class="dot max" title="放大"></span>
+        <span class="dot min" title="小化"></span>
+      </div>
     </div>
     <div class="terminal-body">
       <span class="prompt">$</span><span id="typed"></span><span class="t-cursor">_</span>
@@ -399,7 +401,7 @@ function pickRandom(n){
 function buildSwatches(){
   const box=document.getElementById('swatches');
   box.innerHTML='';
-  const list=pickRandom(6);
+  const list=pickRandom(5);
   const cur=currentPalette();
   list.forEach(p=>{
     const b=document.createElement('button');
@@ -445,23 +447,14 @@ function openPanel(){
 function closePanel(){
   panel.classList.remove('open');
 }
-paletteBtn.addEventListener('click',openPanel);
+paletteBtn.addEventListener('click',()=>{
+  if(panel.classList.contains('open')){closePanel();}else{openPanel();}
+});
 document.getElementById('closeDialog').addEventListener('click',closePanel);
 document.addEventListener('click',e=>{
   if(panel.classList.contains('open')&&!panel.contains(e.target)&&!paletteBtn.contains(e.target)){
     closePanel();
   }
-});
-
-/* 自定义颜色（圆形选择器） */
-document.getElementById('colorInput').addEventListener('input',e=>{
-  const hex=e.target.value;
-  state.mode='manual';state.custom=hex;
-  localStorage.setItem(LS+'mode','manual');
-  localStorage.setItem(LS+'custom',hex);
-  applyCustom(hex);
-  document.getElementById('hexText').textContent=hex;
-  document.querySelectorAll('.sw').forEach(s=>s.classList.remove('active'));
 });
 
 /* MD3 Ripple */
