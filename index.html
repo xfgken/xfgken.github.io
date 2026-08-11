@@ -6,14 +6,12 @@
 <title>xfgken · Material You</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 <style>
-/* ===== MD3 Design Tokens（无渐变 · 无阴影 · 单色） ===== */
+/* ===== MD3 Design Tokens（单色系 · 仅深浅区别） ===== */
 :root{
   --primary:#6750A4;
   --on-primary:#FFFFFF;
   --primary-container:#EADDFF;
   --on-primary-container:#21005D;
-  --secondary-container:#E8DEF8;
-  --on-secondary-container:#1D192B;
   --surface:#FEF7FF;
   --on-surface:#1D1B20;
   --surface-container-low:#F7F2FA;
@@ -26,8 +24,6 @@
   --on-primary:#381E72;
   --primary-container:#4F378B;
   --on-primary-container:#EADDFF;
-  --secondary-container:#4A4458;
-  --on-secondary-container:#E8DEF8;
   --surface:#141218;
   --on-surface:#E6E0E9;
   --surface-container-low:#1D1B20;
@@ -54,16 +50,16 @@ body{
   font-variation-settings:'FILL'0,'wght'500,'GRAD'0,'opsz'24;
 }
 
-/* ===== Large Top App Bar（大顶栏） ===== */
+/* ===== Top App Bar（普通顶栏 · 名字在左上角） ===== */
 .appbar{
   position:sticky;top:0;z-index:10;
-  display:flex;align-items:flex-end;justify-content:space-between;
-  height:104px;padding:0 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;padding:0 16px;
   background:var(--surface);
   transition:background-color .9s ease;
 }
-.appbar .title{font-size:28px;font-weight:800;letter-spacing:.3px;}
-.appbar-actions{display:flex;gap:12px;}
+.appbar .title{font-size:20px;font-weight:800;letter-spacing:.3px;}
+.appbar-actions{display:flex;gap:8px;}
 
 /* ===== MD3 圆形图标按钮（无阴影） ===== */
 .icon-btn{
@@ -87,29 +83,22 @@ body{
 
 .app{max-width:640px;margin:0 auto;padding:8px 16px 32px;}
 
-/* ===== Hero（单色 primary-container · 居中） ===== */
+/* ===== Hero（头像靠左 · 不居中） ===== */
 .hero{
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  padding:40px 24px 32px;
+  display:flex;align-items:center;gap:20px;
+  padding:28px 24px;
   background:var(--primary-container);
   border-radius:28px;
   transition:background-color .9s ease;
 }
 .hero .avatar{
-  width:100px;height:100px;border-radius:50%;object-fit:cover;
-  border:4px solid var(--surface);
+  width:88px;height:88px;border-radius:50%;object-fit:cover;flex-shrink:0;
+  border:3px solid var(--surface);
   transition:border-color .9s ease;
 }
-.hero .name{
-  margin-top:16px;font-size:28px;font-weight:800;letter-spacing:.5px;
-  color:var(--on-primary-container);
-  transition:color .9s ease;
-}
-.cursor{display:inline-block;width:4px;height:24px;background:currentColor;vertical-align:-4px;margin-left:3px;border-radius:2px;animation:blink 1s step-end infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 .hero .creed{
-  margin-top:8px;font-size:16px;font-weight:600;letter-spacing:.5px;
-  color:var(--on-primary-container);opacity:.85;
+  font-size:17px;font-weight:600;line-height:1.8;letter-spacing:.5px;
+  color:var(--on-primary-container);
   transition:color .9s ease;
 }
 
@@ -180,15 +169,15 @@ footer{
   padding:24px;
   background:var(--surface-container-high);
   color:var(--on-surface);
-  border-radius:50%;                 /* 初始与按钮一致的圆形圆角 */
-  transform-origin:top right;        /* 对着右上角按钮方向 */
+  border-radius:50%;
+  transform-origin:top right;
   transform:scale(.1);
   opacity:0;pointer-events:none;
   transition:transform .45s cubic-bezier(.2,0,0,1),border-radius .45s cubic-bezier(.2,0,0,1),opacity .25s,background-color .9s ease;
 }
 .palette-panel.open{
   transform:scale(1);
-  border-radius:24px;                /* 放大为方形圆角卡片 */
+  border-radius:24px;
   opacity:1;pointer-events:auto;
 }
 .palette-panel .inner{opacity:0;transition:opacity .3s .18s;}
@@ -226,8 +215,8 @@ footer{
 @keyframes ripple{to{transform:scale(2.6);opacity:0;}}
 
 @media (max-width:400px){
-  .hero .avatar{width:84px;height:84px;}
-  .hero .name{font-size:24px;}
+  .hero .avatar{width:72px;height:72px;}
+  .hero .creed{font-size:15px;}
 }
 </style>
 </head>
@@ -250,7 +239,7 @@ footer{
   </div>
 </div>
 
-<!-- Large Top App Bar -->
+<!-- Top App Bar：名字在左上角 -->
 <header class="appbar">
   <span class="title">xfgken</span>
   <div class="appbar-actions">
@@ -267,10 +256,9 @@ footer{
 </header>
 
 <main class="app">
-  <!-- Hero：单色大圆角 · 居中 -->
+  <!-- Hero：头像靠左 -->
   <section class="hero">
     <img class="avatar" src="lemon.png" alt="avatar">
-    <h2 class="name"><span id="typed"></span><span class="cursor"></span></h2>
     <p class="creed">永远相信美好的事情即将发生</p>
   </section>
 
@@ -361,31 +349,23 @@ function mixHex(a,b,t){
   return '#'+((1<<24)+(r<<16)+(g<<8)+bl).toString(16).slice(1);
 }
 
-/* 状态 */
-let autoPick=null;
+/* 状态：默认仅紫色一种，用户选择后记住 */
 let state={
-  mode:localStorage.getItem(LS+'mode')||'auto',
+  mode:localStorage.getItem(LS+'mode')||'default',
   idx:parseInt(localStorage.getItem(LS+'idx')||'0',10),
   custom:localStorage.getItem(LS+'custom')||''
 };
 
-/* 当前配色：auto=刷新随机（首次默认紫色）；manual=用户选择 */
+/* 当前配色：默认=紫色（唯一默认色）；manual=用户选择 */
 function currentPalette(){
   if(state.mode==='manual'){
     if(state.custom)return null;
     return PALETTES[state.idx]||PALETTES[0];
   }
-  if(autoPick)return autoPick;
-  if(localStorage.getItem(LS+'first')===null){
-    localStorage.setItem(LS+'first','1');
-    autoPick=PALETTES[0]; /* 默认紫色 */
-  }else{
-    autoPick=PALETTES[Math.floor(Math.random()*PALETTES.length)];
-  }
-  return autoPick;
+  return PALETTES[0]; /* 默认紫色 */
 }
 
-/* 随机抽取 6 种配色 */
+/* 随机抽取 6 种配色供选择 */
 function pickRandom(n){
   const arr=[...PALETTES],out=[];
   while(arr.length&&out.length<n){
@@ -478,7 +458,7 @@ document.addEventListener('click',e=>{
   setTimeout(()=>r.remove(),500);
 });
 
-/* 初始化 */
+/* 初始化：默认紫色（仅一种颜色） */
 (function init(){
   const savedTheme=localStorage.getItem(LS+'theme');
   if(savedTheme)root.setAttribute('data-theme',savedTheme);
@@ -486,14 +466,6 @@ document.addEventListener('click',e=>{
   if(p)applyPalette(p);
   else applyCustom(state.custom||'#6750A4');
   buildSwatches();
-})();
-
-/* 打字机 */
-const text="xfgken";
-const el=document.getElementById('typed');
-let i=0;
-(function type(){
-  if(i<text.length){el.textContent+=text.charAt(i);i++;setTimeout(type,150);}
 })();
 </script>
 </body>
