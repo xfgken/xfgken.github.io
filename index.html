@@ -202,7 +202,7 @@ footer{
   transition:transform .2s cubic-bezier(.2,0,0,1),border-color .2s;
 }
 .sw:hover{transform:scale(1.15);}
-.sw.active{border-color:var(--on-surface);box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--primary);transition:border-color .2s,box-shadow .5s ease;}
+.sw.active{border:3px solid var(--on-surface);outline:2px solid var(--primary);outline-offset:1px;transition:border-color .2s,outline-color .5s ease;}
 .custom-row{display:flex;align-items:center;gap:14px;}
 .custom-row label{font-size:14px;color:var(--on-surface-variant);flex:1;font-weight:600;transition:color .9s ease;}
 .color-input{
