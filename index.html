@@ -208,6 +208,18 @@ footer{
 @media (max-width:400px){
   .tag{font-size:13px;}
 }
+
+/* 设备自适应比例（手机默认铺满 · 平板适中 · PC更宽） */
+@media(min-width:401px)and(max-width:768px){
+  .app{padding:16px 20px 8px;}
+  .creed-text{font-size:clamp(27px,8vw,35px);}
+}
+@media(min-width:769px){
+  .app{max-width:900px;padding:20px 32px 10px;}
+  .creed-text{font-size:clamp(28px,4vw,36px);}
+  .tag{font-size:15px;height:44px;}
+  .creed-text .c4{font-size:clamp(34px,5vw,44px);}
+}
 </style>
 </head>
 <body>
